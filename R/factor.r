@@ -40,7 +40,7 @@ print.freq <- function(x, type = "rest", ...) {
     lgroup <- c(attr(x, "lgroup"))
     n.lgroup <- c(attr(x, "n.lgroup"))
     rownames <- sub("(.+)(\\:)(.+)", "\\3", rownames(x))
-    print(ascii(x, include.colnames = TRUE, include.rownames = TRUE, rownames = rownames, lgroup = lgroup, n.lgroup = n.lgroup), type = type)
+    print(ascii:::ascii(x, include.colnames = TRUE, include.rownames = TRUE, rownames = rownames, lgroup = lgroup, n.lgroup = n.lgroup), type = type)
   }
   invisible(x)
 }
@@ -108,8 +108,8 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 }
 
 
-print.tabular <- function(x, ...) {
-  ascii:::show.rest.table(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.colnames = TRUE, header = TRUE)
+print.tabular <- function(x, type = "rest", ...) {
+  print(ascii:::ascii(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.colnames = TRUE, header = TRUE), type = type)
   invisible(x)
 }
 

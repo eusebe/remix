@@ -28,7 +28,7 @@ resume <- function(x, funs = c(mean, sd, quantile), ...) {
     fun <- match.fun(funs)
 
   results <- fun(x, ...)
-  class(results) <- "resume"
+  class(results) <- c("resume", "matrix")
   results
 }
 
@@ -44,9 +44,21 @@ resume.data.frame <- function(df, funs = c(mean, sd, quantile), ...) {
   results
 }
 
-print.resume <- function(x, ...) {
-  ascii:::show.rest.table(unclass(x), include.rownames = TRUE, include.colnames = TRUE, header = TRUE)
+print.resume <- function(x, type = "rest", ...) {
+  if (is.null(nrow(x))) {
+    x <- t(x)
+  }
+  class(x) <- class(x)[-1]
+  print(ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE), type = type)
   invisible(x)
+}
+
+ascii.resume <- function(x, ...) {
+  if (is.null(nrow(x))) {
+    x <- t(x)
+  }
+  class(x) <- class(x)[-1]
+  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE)
 }
 
 is.resume <- function(x)
@@ -69,7 +81,7 @@ resume.by <- function(x, by, funs = c(mean, sd, quantile), ...) {
   lgroup <- lapply(results, function(x) names(x))
   n.lgroup <- NULL
 
-  class(results) <- "resume.by"
+  class(results) <- c("resume.by", "list")
   attr(results, "split_type") <- NULL
   attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
@@ -100,7 +112,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
   nr <- nrow(results[[1]][[1]])
   n.lgroup <- list(nr, nr*sapply(r, length))
 
-  class(results) <- "resume.by"
+  class(results) <- c("resume.by", "list")
   attr(results, "split_type") <- NULL
   attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
@@ -109,7 +121,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
   results
 }
 
-print.resume.by <- function(x, ...) {
+print.resume.by <- function(x, type = "rest", ...) {
   xx <- NULL
   for (i in 1:length(x)) {
     for (j in 1:length(x[[i]])) {
@@ -120,9 +132,26 @@ print.resume.by <- function(x, ...) {
   include.rownames = TRUE
   if (is.null(attr(x, "n.lgroup")))
     include.rownames = FALSE
-  
-  ascii:::show.rest.table(xx, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), include.rownames = include.rownames, include.colnames = TRUE, header = TRUE)
+
+  class(x) <- class(x)[-1]
+  print(ascii:::ascii(xx, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), include.rownames = include.rownames, include.colnames = TRUE, header = TRUE), type = type)
   invisible(x)
+}
+
+ascii.resume.by <- function(x, ...) {
+  xx <- NULL
+  for (i in 1:length(x)) {
+    for (j in 1:length(x[[i]])) {
+      xx <- rbind(xx, x[[i]][[j]])
+    }
+  }
+
+  include.rownames = TRUE
+  if (is.null(attr(x, "n.lgroup")))
+    include.rownames = FALSE
+
+  class(x) <- class(x)[-1]
+  ascii:::ascii(xx, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), include.rownames = include.rownames, include.colnames = TRUE, header = TRUE)
 }
 
 is.resume.by <- function(x)
@@ -145,9 +174,15 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
   results
 }
 
-print.correlation <- function(x, ...) {
-  ascii:::show.rest.table(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE)
+print.correlation <- function(x, type = "rest", ...) {
+  class(x) <- class(x)[-1]
+  print(ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE), type = type)
   invisible(x)
+}
+
+ascii.correlation <- function(x, ...) {
+  class(x) <- class(x)[-1]
+  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE)
 }
 
 is.correlation <- function(x)

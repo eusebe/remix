@@ -119,7 +119,7 @@ remix <- function(formula, data, funs = c(mean, sd, quantile), ..., cum = FALSE,
   results
 }
 
-print.remix <- function(x, ...) {
+print.remix <- function(x, type = "rest", ...) {
   xx <- x
   attr(xx, "formula") <- NULL
   attr(xx, "num") <- NULL
@@ -133,3 +133,6 @@ print.remix <- function(x, ...) {
 
 is.remix <- function(x)
     inherits(x, "remix")
+
+ascii.remix <- function(x) {
+}
