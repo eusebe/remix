@@ -1,0 +1,72 @@
+remove_blank <- function(formula) {
+  gsub(" ", "", formula)
+}
+
+remove_var <- function(formula) {
+  formula <- remove_blank(formula)
+  gsub("(-.*)([\\+\\~]?)", "\\2", formula)
+}
+
+left_right<- function(formula) {
+  formula <- remove_blank(formula)
+  lr <- unlist(strsplit(formula, "~"))
+  lr <- c(lr[1], unlist(strsplit(lr[2], "\\|")))
+  lr <- strsplit(lr, "\\+")
+  lr <- lapply(lr, function(x) {
+    y <- strsplit(x, "-")
+    unlist(lapply(y, function(y) y[1]))
+  })
+  if (length(lr) == 2)
+    lr <- c(lr, ".")
+    
+  names(lr) <- c("left", "right", "by")
+  if (all(lr$by == "."))
+    lr$by <- "."
+  if (length(lr$by) > 1)
+    lr$by <- lr$by[lr$by != "."]
+  lr$by <- unlist(strsplit(gsub("(c *\\()(.*)(\\))", "\\2", lr$by), ","))
+
+  lr
+}
+
+check_formula <- function (formula) {
+  vars <- unlist(left_right(formula)[c("left", "right")])
+  if (length(unique(vars)) < length(vars)) 
+    warning("Variable(s) repeated several times: ", paste(names(table(vars))[table(vars) > 1], collapse = ", "), call. = FALSE)
+}
+
+expand_formula <- function(formula, varnames) {
+  formula <- remove_blank(formula)
+  vars <- all.vars(as.formula(formula))
+  collapse <- "+"
+  if (grepl("c *\\(.*\\.\\.\\..*\\)", formula))
+    collapse <- ","
+  replacement <- paste(setdiff(varnames, vars), collapse = collapse)
+  formula <- sub("\\.\\.\\.", replacement, formula)
+  as.character(formula)
+}
+
+parse_formula <- function(formula, varnames) {
+  check_formula(formula)
+  formula <- expand_formula(formula, varnames)
+  left_right(formula)
+}
+
+parse_data <- function(formula, data) {
+  vars <- unlist(left_right(formula))
+  vars <- vars[vars != "."]
+  vars <- gsub("(c *\\()(.*)(\\))", "\\2", vars)
+  vars <- unlist(strsplit(gsub("(c *\\()(.*)(\\))", "\\2", vars), ","))
+  ## vars <- gsub("c *\\(", "cbind(", vars) # mais ne donne pas les bons noms aux variables...
+  formula <- paste("~", paste(vars, collapse = "+"), sep = "")
+    
+  results <- model.frame(formula, data, na.action = NULL)
+  inter <- unlist(strsplit(formula, "\\~|\\+"))
+  inter <- inter[grep(":", inter)]
+  varinter <- strsplit(inter, ":")
+  dfinter <- as.data.frame(lapply(varinter, function(x) interaction(results[, x])))
+  names(dfinter) <- inter
+  if (!all(dim(dfinter) == 0))
+    results <- data.frame(results, dfinter, check.names = FALSE)
+  results
+}
