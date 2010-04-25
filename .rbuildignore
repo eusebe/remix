@@ -1,9 +1,4 @@
-R/init.r
-R/load.r
-R/load.dev.r
 R/test.r
-R/factor.dev.r
-R/ascii.r
 
 TODO*
 .Rhistory

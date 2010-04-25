@@ -8,7 +8,6 @@ Maintainer: David Hajage <dhajage@gmail.com>
 Description: remix provides remix, a quick and easy function for describing datasets. 
   It can be view as a mix of cast (in package reshape) and summary.formula 
   (in package Hmisc).
-Depends: plyr
-Imports: gdata
+Depends: plyr, ascii
 License: GPL (>= 2)
 LazyLoad: yes
