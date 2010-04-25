@@ -131,11 +131,11 @@ print.remix <- function(x, type = "rest", ...) {
   invisible(x)
 }
 
-ascii.remix <- function(x, caption.level = "m", ...) {
+ascii.remix <- function(x, caption.level = "m", format = "fg", digits = 5, ...) {
   captions <- names(x)
   xx <- NULL
   for (i in 1:length(x)) {
-    xx <- ascii:::asciiMixed$new(xx, ascii(x[[i]], caption = captions[i], caption.level = caption.level, ...))
+    xx <- ascii:::asciiMixed$new(xx, ascii(x[[i]], caption = captions[i], caption.level = caption.level, format = format, ...))
     class(xx) <- c("ascii", "proto", "environment")
   }
   xx
