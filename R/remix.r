@@ -135,7 +135,7 @@ ascii.remix <- function(x, caption.level = "m", format = "nice", digits = 5, ...
   captions <- names(x)
   xx <- NULL
   for (i in 1:length(x)) {
-    xx <- ascii:::asciiMixed$new(xx, ascii(x[[i]], caption = captions[i], caption.level = caption.level, format = format, ...))
+    xx <- ascii:::asciiMixed$new(xx, ascii(x[[i]], caption = captions[i], caption.level = caption.level, format = format, digits = digits, ...))
     class(xx) <- c("ascii", "proto", "environment")
   }
   xx
