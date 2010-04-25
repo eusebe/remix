@@ -113,7 +113,7 @@ remix <- function(formula, data, funs = c(mean, sd, quantile, n, na), ..., cum =
       results <- results[[1]]
   }
   
-  class(results) <- c("remix", "list")
+  class(results) <- c("remix")
   attr(results, "formula") <- formula
   attr(results, "data") <- data
   results
