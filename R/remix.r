@@ -113,7 +113,7 @@ remix <- function(formula, data, funs = c(mean, sd, quantile), ..., cum = FALSE,
       results <- results[[1]]
   }
   
-  class(results) <- c("list", "remix")
+  class(results) <- c("remix", "list")
   attr(results, "formula") <- formula
   attr(results, "data") <- data
   results
@@ -131,8 +131,15 @@ print.remix <- function(x, type = "rest", ...) {
   invisible(x)
 }
 
+ascii.remix <- function(x, caption.level = "m", ...) {
+  captions <- names(x)
+  xx <- NULL
+  for (i in 1:length(x)) {
+    xx <- ascii:::asciiMixed$new(xx, ascii(x[[i]], caption = captions[i], caption.level = caption.level, ...))
+    class(xx) <- c("ascii", "proto", "environment")
+  }
+  xx
+}
+
 is.remix <- function(x)
     inherits(x, "remix")
-
-ascii.remix <- function(x) {
-}

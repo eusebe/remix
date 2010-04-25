@@ -44,21 +44,17 @@ resume.data.frame <- function(df, funs = c(mean, sd, quantile), ...) {
   results
 }
 
-print.resume <- function(x, type = "rest", ...) {
-  if (is.null(nrow(x))) {
-    x <- t(x)
-  }
-  class(x) <- class(x)[-1]
-  print(ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE), type = type)
-  invisible(x)
-}
-
 ascii.resume <- function(x, ...) {
   if (is.null(nrow(x))) {
     x <- t(x)
   }
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE)
+  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...)
+}
+
+print.resume <- function(x, type = "rest", ...) {
+  print(ascii(x, ...), type = type)
+  invisible(x)
 }
 
 is.resume <- function(x)
@@ -121,23 +117,6 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
   results
 }
 
-print.resume.by <- function(x, type = "rest", ...) {
-  xx <- NULL
-  for (i in 1:length(x)) {
-    for (j in 1:length(x[[i]])) {
-      xx <- rbind(xx, x[[i]][[j]])
-    }
-  }
-
-  include.rownames = TRUE
-  if (is.null(attr(x, "n.lgroup")))
-    include.rownames = FALSE
-
-  class(x) <- class(x)[-1]
-  print(ascii:::ascii(xx, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), include.rownames = include.rownames, include.colnames = TRUE, header = TRUE), type = type)
-  invisible(x)
-}
-
 ascii.resume.by <- function(x, ...) {
   xx <- NULL
   for (i in 1:length(x)) {
@@ -151,7 +130,12 @@ ascii.resume.by <- function(x, ...) {
     include.rownames = FALSE
 
   class(x) <- class(x)[-1]
-  ascii:::ascii(xx, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), include.rownames = include.rownames, include.colnames = TRUE, header = TRUE)
+  ascii:::ascii(xx, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), include.rownames = include.rownames, include.colnames = TRUE, header = TRUE, ...)
+}
+
+print.resume.by <- function(x, type = "rest", ...) {
+  print(ascii(x, ...), type = type)
+  invisible(x)
 }
 
 is.resume.by <- function(x)
@@ -174,15 +158,14 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
   results
 }
 
-print.correlation <- function(x, type = "rest", ...) {
-  class(x) <- class(x)[-1]
-  print(ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE), type = type)
-  invisible(x)
-}
-
 ascii.correlation <- function(x, ...) {
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE)
+  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...)
+}
+
+print.correlation <- function(x, type = "rest", ...) {
+  print(ascii(x, ...), type = type)
+  invisible(x)
 }
 
 is.correlation <- function(x)

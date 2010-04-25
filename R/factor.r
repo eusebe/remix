@@ -33,15 +33,16 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   results
 }
 
+ascii.freq <- function(x, ...) {
+  lgroup <- c(attr(x, "lgroup"))
+  n.lgroup <- c(attr(x, "n.lgroup"))
+  rownames <- sub("(.+)(\\:)(.+)", "\\3", rownames(x))
+  class(x) <- class(x)[-1]
+  ascii:::ascii(x, include.colnames = TRUE, include.rownames = TRUE, rownames = rownames, lgroup = lgroup, n.lgroup = n.lgroup, ...)
+}
+
 print.freq <- function(x, type = "rest", ...) {
-  if (is.null(type)) {
-    print.data.frame(x)
-  } else {
-    lgroup <- c(attr(x, "lgroup"))
-    n.lgroup <- c(attr(x, "n.lgroup"))
-    rownames <- sub("(.+)(\\:)(.+)", "\\3", rownames(x))
-    print(ascii:::ascii(x, include.colnames = TRUE, include.rownames = TRUE, rownames = rownames, lgroup = lgroup, n.lgroup = n.lgroup), type = type)
-  }
+  print(ascii(x, ...), type = type)
   invisible(x)
 }
 
@@ -107,9 +108,13 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   results
 }
 
+ascii.tabular <- function(x, ...) {
+  class(x) <- class(x)[-1]
+  ascii:::ascii(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.colnames = TRUE, header = TRUE, ...)
+}
 
 print.tabular <- function(x, type = "rest", ...) {
-  print(ascii:::ascii(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.colnames = TRUE, header = TRUE), type = type)
+  print(ascii:::ascii(x, ...), type = type)
   invisible(x)
 }
 
