@@ -12,8 +12,16 @@ funs2fun <- function(...) {
     results
   }
 }
-  
-resume <- function(x, funs = c(mean, sd, quantile), ...) {
+
+n <- function(x, na.rm = FALSE) {
+  sum(!is.na(x))
+}
+
+na <- function(x, na.rm = FALSE) {
+  sum(is.na(x))
+}
+
+resume <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 
@@ -32,7 +40,7 @@ resume <- function(x, funs = c(mean, sd, quantile), ...) {
   results
 }
 
-resume.data.frame <- function(df, funs = c(mean, sd, quantile), ...) {
+resume.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -60,7 +68,7 @@ print.resume <- function(x, type = "rest", ...) {
 is.resume <- function(x)
   inherits(x, "resume")
 
-resume.by <- function(x, by, funs = c(mean, sd, quantile), ...) {
+resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ...) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 

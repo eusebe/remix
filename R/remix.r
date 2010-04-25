@@ -1,4 +1,4 @@
-cross <- function(x, y = NULL, funs = c(mean, sd, quantile), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
+cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -41,7 +41,7 @@ cross <- function(x, y = NULL, funs = c(mean, sd, quantile), ..., cum = FALSE, m
   results
 }
 
-cross_list <- function(l, funs = c(mean, sd, quantile), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
+cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
 
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
@@ -58,7 +58,7 @@ cross_list <- function(l, funs = c(mean, sd, quantile), ..., cum = FALSE, margin
   cross(x = x, y = y, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, method = method)
 }
 
-remix <- function(formula, data, funs = c(mean, sd, quantile), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
+remix <- function(formula, data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
   
   if (is.formula(formula))
     formula <- deparse(formula, 500)
