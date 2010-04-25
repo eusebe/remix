@@ -33,7 +33,7 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   results
 }
 
-ascii.freq <- function(x, format = "fg", digits = 5, ...) {
+ascii.freq <- function(x, format = "g", digits = 5, ...) {
   lgroup <- c(attr(x, "lgroup"))
   n.lgroup <- c(attr(x, "n.lgroup"))
   rownames <- sub("(.+)(\\:)(.+)", "\\3", rownames(x))
@@ -108,7 +108,7 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   results
 }
 
-ascii.tabular <- function(x, format = "fg", digits = 5, ...) {
+ascii.tabular <- function(x, format = "g", digits = 5, ...) {
   class(x) <- class(x)[-1]
   ascii:::ascii(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
 }
