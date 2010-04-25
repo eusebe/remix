@@ -8,10 +8,10 @@ cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = F
   
   if (!is.null(x) & !is.null(y)) {
     if (all(sapply(x, is.numeric)) & all(!sapply(y, is.numeric))) {
-      results <- resume.data.frame.by(x, y, funs = funs, ...)
+      results <- resume.data.frame.by(x, y, funs = funs, ..., useNA = useNA)
     }
     if (all(sapply(y, is.numeric)) & all(!sapply(x, is.numeric))) {
-      results <- resume.data.frame.by(y, x, funs = funs, ...)
+      results <- resume.data.frame.by(y, x, funs = funs, ..., useNA = useNA)
     }
     if (all(!sapply(x, is.numeric)) & all(!sapply(y, is.numeric))) {
       results <- tabular.data.frame(x, y, margin = margin, useNA = useNA)

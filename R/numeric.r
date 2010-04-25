@@ -68,12 +68,17 @@ print.resume <- function(x, type = "rest", ...) {
 is.resume <- function(x)
   inherits(x, "resume")
 
-resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ...) {
+resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 
   by <- as.character(by)
-  by[is.na(by)] <- "NA"
+  if (useNA[1] != "no") {
+    by[is.na(by)] <- "NA"
+  } else {
+    x <- x[!is.na(by)]
+    by <- by[!is.na(by)]
+  }
   
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
@@ -97,14 +102,16 @@ resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ...) {
   results
 }
 
-resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
+resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
   }
 
   by <- sapply(by, as.character)
-  by[is.na(by)] <- "NA"
+  if (useNA[1] != "no") {
+    by[is.na(by)] <- "NA"
+  }
 
   nby <- ncol(by)
   namesby <- paste("by", 1:nby, sep = ".")
@@ -113,7 +120,11 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
   names(df) <- c(names(df)[1:(length(names(df))-nby)], namesby)
   results <- NULL
   for (i in 1:nby) {
-    results <- c(results, list(dlply(df, namesby[i], fun, funs = funs, ...)))
+    dfi <- df
+    if (useNA[1] == "no") {
+      dfi <- dfi[!is.na(by[, i]), ]
+    }
+    results <- c(results, list(dlply(dfi, namesby[i], fun, funs = funs, ...)))
   }
   names(results) <- colnames(by)
 
