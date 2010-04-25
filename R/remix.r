@@ -58,7 +58,7 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
   cross(x = x, y = y, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, method = method)
 }
 
-remix <- function(formula, data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
+remix <- function(formula = ... ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
   
   if (is.formula(formula))
     formula <- deparse(formula, 500)
