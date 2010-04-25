@@ -107,7 +107,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
   for (i in 1:nby) {
     results <- c(results, list(dlply(df, namesby[i], fun, funs = funs, ...)))
   }
-  names(results) <- names(by)
+  names(results) <- colnames(by)
 
   r <- lapply(results, function(x) names(x))
   lgroup <- list(unlist(r), names(results))
