@@ -64,6 +64,9 @@ resume.by <- function(x, by, funs = c(mean, sd, quantile), ...) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 
+  by <- as.character(by)
+  by[is.na(by)] <- "NA"
+  
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -91,6 +94,9 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
   }
+
+  by <- sapply(by, as.character)
+  by[is.na(by)] <- "NA"
 
   nby <- ncol(by)
   namesby <- paste("by", 1:nby, sep = ".")
