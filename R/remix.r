@@ -119,18 +119,6 @@ remix <- function(formula, data, funs = c(mean, sd, quantile, n, na), ..., cum =
   results
 }
 
-print.remix <- function(x, type = "rest", ...) {
-  xx <- x
-  attr(xx, "formula") <- NULL
-  attr(xx, "num") <- NULL
-  attr(xx, "nonum") <- NULL
-  attr(xx, "class") <- NULL
-  attr(xx, "data") <- NULL
-  
-  print.default(xx)
-  invisible(x)
-}
-
 ascii.remix <- function(x, caption.level = "m", format = "nice", digits = 5, ...) {
   captions <- names(x)
   xx <- NULL
@@ -139,6 +127,11 @@ ascii.remix <- function(x, caption.level = "m", format = "nice", digits = 5, ...
     class(xx) <- c("ascii", "proto", "environment")
   }
   xx
+}
+
+print.remix <- function(x, type = "rest", caption.level = NULL, ...) {
+  print(ascii(x, caption.level = caption.level, ...), type = "rest")
+  invisible(x)
 }
 
 is.remix <- function(x)
