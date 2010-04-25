@@ -52,7 +52,7 @@ resume.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   results
 }
 
-ascii.resume <- function(x, format = "g", digits = 5, ...) {
+ascii.resume <- function(x, format = "nice", digits = 5, ...) {
   if (is.null(nrow(x))) {
     x <- t(x)
   }
@@ -131,7 +131,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile), ...) {
   results
 }
 
-ascii.resume.by <- function(x, format = "g", digits = 5, ...) {
+ascii.resume.by <- function(x, format = "nice", digits = 5, ...) {
   xx <- NULL
   for (i in 1:length(x)) {
     for (j in 1:length(x[[i]])) {
@@ -172,7 +172,7 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
   results
 }
 
-ascii.correlation <- function(x, format = "g", digits = 5, ...) {
+ascii.correlation <- function(x, format = "nice", digits = 5, ...) {
   class(x) <- class(x)[-1]
   ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
 }
