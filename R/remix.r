@@ -58,7 +58,29 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
   cross(x = x, y = y, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, method = method)
 }
 
-remix <- function(formula = ... ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
+regroup <- function(vars, numdata) {
+  vars <- strsplit(sub("(c\\()(.*)(\\))", "\\2", vars), ",")
+  unlist(lapply(vars, function(x) {
+    if (!all(x %in% numdata) | !all(!(x %in% numdata))) {
+      if (length(x[x %in% numdata]) == 1)
+        xx <- x[x %in% numdata]
+      else 
+        xx <- paste("c(", paste(x[x %in% numdata], collapse = ","), ")", sep = "")
+      if (length(x[!(x %in% numdata)]) == 1)
+        xx <- c(xx, x[!(x %in% numdata)])
+      else 
+        xx <- c(xx, paste("c(", paste(x[!(x %in% numdata)], collapse = ","), ")", sep = ""))
+    } else {
+      if (length(x) == 1)
+        xx <- x
+      else
+        xx <- paste("c(", paste(x, collapse = ","), ")", sep = "")
+    }
+    xx[xx != "c()"]
+  }))
+}
+
+remix <- function(formula = c(...) ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
   
   if (is.formula(formula))
     formula <- deparse(formula, 500)
@@ -73,6 +95,10 @@ remix <- function(formula = ... ~ ., data, funs = c(mean, sd, quantile, n, na), 
   
   data <-   parse_data(expand_formula(formula, varnames), data)
   varform <- names(data)
+
+  numdata <- varform[sapply(data, is.numeric)]
+  parsed$left <- regroup(parsed$left, numdata)
+  parsed$right <- regroup(parsed$right, numdata)
   
   eg <- expand.grid(parsed$left, parsed$right)
   
