@@ -115,21 +115,52 @@ remix <- function(formula = ... ~ ., data, funs = c(mean, sd, quantile, n, na), 
   
   class(results) <- c("remix")
   attr(results, "formula") <- formula
+  attr(results, "left") <- parsed$left
+  attr(results, "right") <- parsed$right
+  attr(results, "by") <- parsed$by
+  
   attr(results, "data") <- data
   results
 }
 
-ascii.remix <- function(x, caption.level = "m", format = "nice", digits = 5, ...) {
-  captions <- names(x)
-  xx <- NULL
-  for (i in 1:length(x)) {
-    xx <- ascii:::asciiMixed$new(xx, ascii(x[[i]], caption = captions[i], caption.level = caption.level, format = format, digits = digits, ...))
-    class(xx) <- c("ascii", "proto", "environment")
+ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", digits = 5, ...) {
+  xx <- ascii:::asciiMixed$new(NULL)
+  class(xx) <- c("ascii", "proto", "environment")
+  if (all(attr(x, "by") == ".")) {
+    captions <- names(x)
+    for (i in 1:length(x)) {
+      xx[[paste("obj", i, sep = "")]] <- ascii(x[[i]], caption = captions[i], caption.level = caption.level[3], format = format, digits = digits, ...)
+    }
+  } else if (length(attr(x, "by")) == 1) {
+    captions1 <- names(x)
+    captions2 <- names(x[[1]])
+    for (i in 1:length(x)) {
+      asc.cap1 <- ascii(list(NULL), caption = captions1[i], caption.level = caption.level[2])
+      xx[[paste("obj", i, sep = "")]] <- asc.cap1
+      for (j in 1:length(x[[i]])) {
+        xx[[paste("obj", i, j, sep = "")]] <- ascii(x[[i]][[j]], caption = captions2[j], caption.level = caption.level[3], format = format, digits = digits, ...)
+      }
+    }
+  } else if (length(attr(x, "by")) > 1) {
+    captions1 <- names(x)
+    captions3 <- names(x[[1]][[1]])
+    for (i in 1:length(x)) {
+      asc.cap1 <- ascii(list(NULL), caption = captions1[i], caption.level = caption.level[1])
+      xx[[paste("obj", i, sep = "")]] <- asc.cap1
+      for (j in 1:length(x[[i]])) {
+        captions2 <- names(x[[i]])
+        asc.cap2 <- ascii(list(NULL), caption = captions2[j], caption.level = caption.level[2])
+        xx[[paste("obj", i, j, sep = "")]] <- asc.cap2
+        for (k in 1:length(x[[i]][[j]])) {
+          xx[[paste("obj", i, j, k, sep = "")]] <- ascii(x[[i]][[j]][[k]], caption = captions3[k], caption.level = caption.level[3], format = format, digits = digits)
+        }
+      }
+    }
   }
   xx
 }
 
-print.remix <- function(x, type = "rest", caption.level = NULL, ...) {
+print.remix <- function(x, type = "rest", caption.level = 2:4, ...) {
   print(ascii(x, caption.level = caption.level, ...), type = "rest")
   invisible(x)
 }
