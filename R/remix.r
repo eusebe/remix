@@ -101,7 +101,7 @@ remix <- function(formula = ... ~ ., data, funs = c(mean, sd, quantile, n, na), 
     combby <- lapply(databy, function(o) lapply(o, function(p) lapply(apply(eg, 1, list), function(x) {
       y <- unlist(x)
       y <- y[y != "."]
-      y <- sub("(c\\()([^\\)]*)(\\))", "\\2", y)
+      y <- sub("(c *\\()(.*)(\\))", "\\2", y)
       lapply(y, function(z) p[, strsplit(z, ",")[[1]], drop = FALSE])})))
 
     results <- lapply(combby, function(x) lapply(x, function(comb) {
