@@ -52,12 +52,12 @@ resume.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   results
 }
 
-ascii.resume <- function(x, format = "nice", digits = 5, ...) {
+ascii.resume <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...) {
   if (is.null(nrow(x))) {
     x <- t(x)
   }
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
+  ascii:::ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
 print.resume <- function(x, type = "rest", ...) {
@@ -142,7 +142,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..
   results
 }
 
-ascii.resume.by <- function(x, format = "nice", digits = 5, ...) {
+ascii.resume.by <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
   xx <- NULL
   for (i in 1:length(x)) {
     for (j in 1:length(x[[i]])) {
@@ -150,12 +150,8 @@ ascii.resume.by <- function(x, format = "nice", digits = 5, ...) {
     }
   }
 
-  include.rownames = TRUE
-  if (is.null(attr(x, "n.lgroup")))
-    include.rownames = FALSE
-
   class(x) <- class(x)[-1]
-  ascii:::ascii(xx, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), include.rownames = include.rownames, include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
+  ascii:::ascii(xx, lgroup = lgroup, n.lgroup = n.lgroup, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
 print.resume.by <- function(x, type = "rest", ...) {
@@ -183,9 +179,9 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
   results
 }
 
-ascii.correlation <- function(x, format = "nice", digits = 5, ...) {
+ascii.correlation <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...) {
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
+  ascii:::ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
 print.correlation <- function(x, type = "rest", ...) {

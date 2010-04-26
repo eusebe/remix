@@ -29,16 +29,14 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   class(results) <- c("data.frame", "freq")
   attr(results, "lgroup") <- rnames
   attr(results, "n.lgroup") <- nrows
+  attr(results, "rownames") <- sub("(.+)(\\:)(.+)", "\\3", rownames(results))
   class(results) <- c("freq", "data.frame")
   results
 }
 
-ascii.freq <- function(x, format = "nice", digits = 5, ...) {
-  lgroup <- c(attr(x, "lgroup"))
-  n.lgroup <- c(attr(x, "n.lgroup"))
-  rownames <- sub("(.+)(\\:)(.+)", "\\3", rownames(x))
+ascii.freq <- function(x, format = "nice", digits = 5, include.colnames = TRUE, include.rownames = TRUE, rownames = attr(x, "rownames"), lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.colnames = TRUE, include.rownames = TRUE, rownames = rownames, lgroup = lgroup, n.lgroup = n.lgroup, format = format, digits = digits, ...)
+  ascii:::ascii(x, include.colnames = include.colnames, include.rownames = include.rownames, rownames = rownames, lgroup = lgroup, n.lgroup = n.lgroup, format = format, digits = digits, ...)
 }
 
 print.freq <- function(x, type = "rest", ...) {
@@ -108,10 +106,10 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   results
 }
 
-ascii.tabular <- function(x, format = "nice", digits = 5, ...) {
+ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), ...) {
   class(x) <- class(x)[-1]
 
-  ascii:::ascii(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.rownames = FALSE, include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
+  ascii:::ascii(x, lgroup = lgroup, n.lgroup = n.lgroup, tgroup = tgroup, n.tgroup = n.tgroup, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
 print.tabular <- function(x, type = "rest", ...) {
