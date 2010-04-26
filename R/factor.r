@@ -110,7 +110,8 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 
 ascii.tabular <- function(x, format = "nice", digits = 5, ...) {
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
+
+  ascii:::ascii(x, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), include.rownames = FALSE, include.colnames = TRUE, header = TRUE, format = format, digits = digits, ...)
 }
 
 print.tabular <- function(x, type = "rest", ...) {
