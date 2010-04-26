@@ -124,6 +124,7 @@ remix <- function(formula = ... ~ ., data, funs = c(mean, sd, quantile, n, na), 
 }
 
 ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", digits = 5, ...) {
+  caption.level <- rep(caption.level, length = 3)
   xx <- ascii:::asciiMixed$new(NULL)
   class(xx) <- c("ascii", "proto", "environment")
   if (all(attr(x, "by") == ".")) {
@@ -160,7 +161,7 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
   xx
 }
 
-print.remix <- function(x, type = "rest", caption.level = 2:4, ...) {
+print.remix <- function(x, type = "rest", caption.level = 1:3, ...) {
   print(ascii(x, caption.level = caption.level, ...), type = "rest")
   invisible(x)
 }
