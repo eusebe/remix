@@ -34,9 +34,9 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   results
 }
 
-ascii.freq <- function(x, format = "nice", digits = 5, include.colnames = TRUE, include.rownames = TRUE, rownames = attr(x, "rownames"), lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
+ascii.freq <- function(x, format = "nice", digits = 5, include.rownames = TRUE, rownames = attr(x, "rownames"), include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.colnames = include.colnames, include.rownames = include.rownames, rownames = rownames, lgroup = lgroup, n.lgroup = n.lgroup, format = format, digits = digits, ...)
+  ascii:::ascii(x, include.colnames = include.colnames, include.rownames = include.rownames, rownames = rownames, header = header, lgroup = lgroup, n.lgroup = n.lgroup, format = format, digits = digits, ...)
 }
 
 print.freq <- function(x, type = "rest", ...) {

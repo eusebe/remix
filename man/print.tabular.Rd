@@ -4,14 +4,17 @@
   Print tabular object.
 }
 \description{
-  Print tabular object.
+  Print tabular object (internal).
 }
 \usage{
-print.tabular(x, ...)
+print.tabular(x, type = "rest", ...)
 }
 \arguments{
   \item{x}{
     A tabular object.
+  }
+  \item{type}{
+    type of output (see \code{?ascii} in \code{ascii} package)
   }
   \item{\dots}{
     Not used
@@ -20,10 +23,6 @@ print.tabular(x, ...)
 
 \author{
 David Hajage
-}
-
-\seealso{
-  \code{\link{tabular}}
 }
 
 \keyword{univar}

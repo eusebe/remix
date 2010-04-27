@@ -4,14 +4,17 @@
   Print freq object.
 }
 \description{
-  Print freq object.
+  Print freq object (internal).
 }
 \usage{
-print.freq(x, ...)
+print.freq(x, type = "rest", ...)
 }
 \arguments{
   \item{x}{
     A freq object.
+  }
+  \item{type}{
+    type of output (see \code{?ascii} in \code{ascii} package)
   }
   \item{\dots}{
     Not used
@@ -20,10 +23,6 @@ print.freq(x, ...)
 
 \author{
 David Hajage
-}
-
-\seealso{
-  \code{\link{freq}}
 }
 
 \keyword{univar}
