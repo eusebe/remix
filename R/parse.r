@@ -24,7 +24,7 @@ left_right<- function(formula) {
     lr$by <- "."
   if (length(lr$by) > 1)
     lr$by <- lr$by[lr$by != "."]
-  lr$by <- unlist(strsplit(gsub("(c *\\()(.*)(\\))", "\\2", lr$by), ","))
+  lr$by <- unlist(strsplit(gsub("(cbind *\\()(.*)(\\))", "\\2", lr$by), ","))
 
   lr
 }
@@ -39,7 +39,7 @@ expand_formula <- function(formula, varnames) {
   formula <- remove_blank(formula)
   vars <- all.vars(as.formula(formula))
   collapse <- "+"
-  if (grepl("c *\\(.*\\.\\.\\..*\\)", formula))
+  if (grepl("cbind *\\(.*\\.\\.\\..*\\)", formula))
     collapse <- ","
   replacement <- paste(setdiff(varnames, vars), collapse = collapse)
   formula <- sub("\\.\\.\\.", replacement, formula)
@@ -55,8 +55,8 @@ parse_formula <- function(formula, varnames) {
 parse_data <- function(formula, data) {
   vars <- unlist(left_right(formula))
   vars <- vars[vars != "."]
-  vars <- gsub("(c *\\()(.*)(\\))", "\\2", vars)
-  vars <- unlist(strsplit(gsub("(c *\\()(.*)(\\))", "\\2", vars), ","))
+  vars <- gsub("(cbind *\\()(.*)(\\))", "\\2", vars)
+  vars <- unlist(strsplit(gsub("(cbind *\\()(.*)(\\))", "\\2", vars), ","))
   ## vars <- gsub("c *\\(", "cbind(", vars) # mais ne donne pas les bons noms aux variables...
   formula <- paste("~", paste(vars, collapse = "+"), sep = "")
     

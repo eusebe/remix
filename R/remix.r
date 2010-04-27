@@ -59,28 +59,28 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
 }
 
 regroup <- function(vars, numdata) {
-  vars <- strsplit(sub("(c\\()(.*)(\\))", "\\2", vars), ",")
+  vars <- strsplit(sub("(cbind\\()(.*)(\\))", "\\2", vars), ",")
   unlist(lapply(vars, function(x) {
     if (!all(x %in% numdata) | !all(!(x %in% numdata))) {
       if (length(x[x %in% numdata]) == 1)
         xx <- x[x %in% numdata]
       else 
-        xx <- paste("c(", paste(x[x %in% numdata], collapse = ","), ")", sep = "")
+        xx <- paste("cbind(", paste(x[x %in% numdata], collapse = ","), ")", sep = "")
       if (length(x[!(x %in% numdata)]) == 1)
         xx <- c(xx, x[!(x %in% numdata)])
       else 
-        xx <- c(xx, paste("c(", paste(x[!(x %in% numdata)], collapse = ","), ")", sep = ""))
+        xx <- c(xx, paste("cbind(", paste(x[!(x %in% numdata)], collapse = ","), ")", sep = ""))
     } else {
       if (length(x) == 1)
         xx <- x
       else
-        xx <- paste("c(", paste(x, collapse = ","), ")", sep = "")
+        xx <- paste("cbind(", paste(x, collapse = ","), ")", sep = "")
     }
-    xx[xx != "c()"]
+    xx[xx != "cbind()"]
   }))
 }
 
-remix <- function(formula = c(...) ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
+remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
   
   if (is.formula(formula))
     formula <- deparse(formula, 500)
@@ -106,7 +106,7 @@ remix <- function(formula = c(...) ~ ., data, funs = c(mean, sd, quantile, n, na
     comb <- lapply(apply(eg, 1, list), function(x) {
       y <- unlist(x)
       y <- y[y != "."]
-      y <- sub("(c\\()(.*)(\\))", "\\2", y)
+      y <- sub("(cbind\\()(.*)(\\))", "\\2", y)
       lapply(y, function(z) data[, strsplit(z, ",")[[1]], drop = FALSE])})
     
     results <- llply(comb, cross_list, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, method = method)
@@ -127,7 +127,7 @@ remix <- function(formula = c(...) ~ ., data, funs = c(mean, sd, quantile, n, na
     combby <- lapply(databy, function(o) lapply(o, function(p) lapply(apply(eg, 1, list), function(x) {
       y <- unlist(x)
       y <- y[y != "."]
-      y <- sub("(c *\\()(.*)(\\))", "\\2", y)
+      y <- sub("(cbind *\\()(.*)(\\))", "\\2", y)
       lapply(y, function(z) p[, strsplit(z, ",")[[1]], drop = FALSE])})))
 
     results <- lapply(combby, function(x) lapply(x, function(comb) {
