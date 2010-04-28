@@ -1,1 +1,1 @@
-export("remix", "print.remix", "print.resume", "print.resume.by", "print.correlation", "print.freq", "print.tabular", "print.remix", "ascii.resume", "ascii.resume.by", "ascii.correlation", "ascii.freq", "ascii.tabular", "ascii.remix")
+export("remix", "print.remix", "print.summarize", "print.summarize.by", "print.correlation", "print.freq", "print.tabular", "print.remix", "ascii.summarize", "ascii.summarize.by", "ascii.correlation", "ascii.freq", "ascii.tabular", "ascii.remix")

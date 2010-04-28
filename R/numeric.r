@@ -21,7 +21,7 @@ na <- function(x, na.rm = FALSE) {
   sum(is.na(x))
 }
 
-resume <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
+summarize <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 
@@ -36,23 +36,23 @@ resume <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
     fun <- match.fun(funs)
 
   results <- fun(x, ...)
-  class(results) <- c("resume", "matrix")
+  class(results) <- c("summarize", "matrix")
   results
 }
 
-resume.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
+summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
   }
 
   dfl <- as.list(df)
-  results <- t(sapply(dfl, resume, funs = funs, ...))
-  class(results) <- c("resume", "matrix")
+  results <- t(sapply(dfl, summarize, funs = funs, ...))
+  class(results) <- c("summarize", "matrix")
   results
 }
 
-ascii.resume <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...) {
+ascii.summarize <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...) {
   if (is.null(nrow(x))) {
     x <- t(x)
   }
@@ -60,15 +60,15 @@ ascii.resume <- function(x, format = "nice", digits = 5, include.rownames = TRUE
   ascii:::ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
-print.resume <- function(x, type = "rest", ...) {
+print.summarize <- function(x, type = "rest", ...) {
   print(ascii(x, ...), type = type)
   invisible(x)
 }
 
-is.resume <- function(x)
-  inherits(x, "resume")
+is.summarize <- function(x)
+  inherits(x, "summarize")
 
-resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
+summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 
@@ -81,7 +81,7 @@ resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c
     funs <- funs[funs != "c" & funs != "list"]
   }
 
-  fun <- function(df, funs = funs, ...) resume(df[, 1], funs = funs, ...)
+  fun <- function(df, funs = funs, ...) summarize(df[, 1], funs = funs, ...)
   df <- data.frame(x, by, check.names = FALSE)
   names(df) <- c(names(df)[1], "by")
   results <- list(dlply(df, .(by), fun, funs = funs, ...))
@@ -93,7 +93,7 @@ resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c
   })
   n.lgroup <- NULL
 
-  class(results) <- c("resume.by", "list")
+  class(results) <- c("summarize.by", "list")
   attr(results, "split_type") <- NULL
   attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
@@ -102,7 +102,7 @@ resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c
   results
 }
 
-resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
+summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -115,7 +115,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..
 
   nby <- ncol(by)
   namesby <- paste("by", 1:nby, sep = ".")
-  fun <- function(df, funs = funs, ...) resume.data.frame(df[, 1:(ncol(df)-nby), drop = FALSE], funs = funs, ...)
+  fun <- function(df, funs = funs, ...) summarize.data.frame(df[, 1:(ncol(df)-nby), drop = FALSE], funs = funs, ...)
   df <- data.frame(df, by, check.names = FALSE)
   names(df) <- c(names(df)[1:(length(names(df))-nby)], namesby)
   results <- NULL
@@ -138,7 +138,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..
   nr <- nrow(results[[1]][[1]])
   n.lgroup <- list(nr, nr*sapply(r, length))
 
-  class(results) <- c("resume.by", "list")
+  class(results) <- c("summarize.by", "list")
   attr(results, "split_type") <- NULL
   attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
@@ -147,7 +147,7 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..
   results
 }
 
-ascii.resume.by <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
+ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
   xx <- NULL
   for (i in 1:length(x)) {
     for (j in 1:length(x[[i]])) {
@@ -159,13 +159,13 @@ ascii.resume.by <- function(x, format = "nice", digits = 5, include.rownames = T
   ascii:::ascii(xx, lgroup = lgroup, n.lgroup = n.lgroup, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
-print.resume.by <- function(x, type = "rest", ...) {
+print.summarize.by <- function(x, type = "rest", ...) {
   print(ascii(x, ...), type = type)
   invisible(x)
 }
 
-is.resume.by <- function(x)
-  inherits(x, "resume.by")
+is.summarize.by <- function(x)
+  inherits(x, "summarize.by")
 
 correlation <- function(x, y, method = c("pearson", "kendall", "spearman")) {
   results <- cor.test(x, y, method = method)$estimate
