@@ -69,6 +69,8 @@ is.resume <- function(x)
   inherits(x, "resume")
 
 reorderNA <- function(x) {
+  if (is.character(x))
+    x <- factor(x)
   lev <- levels(x)
   ref <- match("NA", lev)
   if (is.na(ref))
@@ -118,10 +120,11 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..
     funs <- funs[funs != "c" & funs != "list"]
   }
 
-  by <- sapply(by, as.character)
   if (useNA[1] != "no") {
+    by <- data.frame(sapply(by, as.character), stringsAsFactors = FALSE)
     by[is.na(by)] <- "NA"
-    by <- sapply(by, function(x) reorderNA(factor(x)))
+    for (i in 1:ncol(by))
+      by[, i] <- reorderNA(by[, i])
   }
 
   nby <- ncol(by)
