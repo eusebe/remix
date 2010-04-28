@@ -68,28 +68,12 @@ print.resume <- function(x, type = "rest", ...) {
 is.resume <- function(x)
   inherits(x, "resume")
 
-reorderNA <- function(x) {
-  if (is.character(x))
-    x <- factor(x)
-  lev <- levels(x)
-  ref <- match("NA", lev)
-  if (is.na(ref))
-    x
-  else
-    factor(x, levels = lev[c(seq_along(lev)[-ref], ref)])
-}
-
 resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 
   if (useNA[1] != "no") {
-    by <- as.character(by)
-    by[is.na(by)] <- "NA"
-    by <- reorderNA(factor(by))
-  } else {
-    x <- x[!is.na(by)]
-    by <- by[!is.na(by)]
+    by <- addNA(by)
   }
   
   if (!is.character(funs)) {
@@ -102,7 +86,11 @@ resume.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c
   names(df) <- c(names(df)[1], "by")
   results <- list(dlply(df, .(by), fun, funs = funs, ...))
 
-  lgroup <- lapply(results, function(x) names(x))
+  lgroup <- lapply(results, function(x) {
+    y <- names(x)
+    y[is.na(y)] <- "NA"
+    y
+  })
   n.lgroup <- NULL
 
   class(results) <- c("resume.by", "list")
@@ -121,10 +109,8 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..
   }
 
   if (useNA[1] != "no") {
-    by <- data.frame(sapply(by, as.character), stringsAsFactors = FALSE)
-    by[is.na(by)] <- "NA"
     for (i in 1:ncol(by))
-      by[, i] <- reorderNA(by[, i])
+      by[, i] <- addNA(by[, i])
   }
 
   nby <- ncol(by)
@@ -142,7 +128,12 @@ resume.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..
   }
   names(results) <- colnames(by)
 
-  r <- lapply(results, function(x) names(x))
+  r <- lapply(results, function(x) {
+    y <- names(x)
+    y[is.na(y)] <- "NA"
+    y
+  })
+  
   lgroup <- list(unlist(r), names(results))
   nr <- nrow(results[[1]][[1]])
   n.lgroup <- list(nr, nr*sapply(r, length))
