@@ -1,3 +1,8 @@
+##' Compute frequencies
+##'
+##' @param x factor
+##' @param useNA useNA
+##' @param cum logical
 freq <- function(x, useNA = c("no", "ifany", "always"), cum = FALSE) {
   rnames <- as.character(as.list(substitute(list(x)))[-1])
   
@@ -17,6 +22,11 @@ freq <- function(x, useNA = c("no", "ifany", "always"), cum = FALSE) {
   results
 }
 
+##' Compute frequencies (data.frame input)
+##'
+##' @param df data.frame
+##' @param useNA useNA
+##' @param cum logical
 freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE) {
   dfl <- as.list(df)
   rnames <- names(dfl)
@@ -34,19 +44,51 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   results
 }
 
+##' Ascii for freq object.
+##'
+##' Ascii method for freq object (internal).
+##'
+##' @export
+##' @param x a freq object
+##' @param format see \code{?ascii} in \code{ascii} package
+##' @param digits see \code{?ascii} in \code{ascii} package
+##' @param include.rownames see \code{?ascii} in \code{ascii} package
+##' @param rownames see \code{?ascii} in \code{ascii} package
+##' @param include.colnames see \code{?ascii} in \code{ascii} package
+##' @param header see \code{?ascii} in \code{ascii} package
+##' @param lgroup see \code{?ascii} in \code{ascii} package
+##' @param n.lgroup see \code{?ascii} in \code{ascii} package
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 ascii.freq <- function(x, format = "nice", digits = 5, include.rownames = TRUE, rownames = attr(x, "rownames"), include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
   class(x) <- class(x)[-1]
   ascii:::ascii(x, include.colnames = include.colnames, include.rownames = include.rownames, rownames = rownames, header = header, lgroup = lgroup, n.lgroup = n.lgroup, format = format, digits = digits, ...)
 }
 
+##' Print freq object.
+##'
+##' Print freq object (internal).
+##'
+##' @export
+##' @param x a freq object
+##' @param type type of output (see \code{?ascii} in \code{ascii} package)
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 print.freq <- function(x, type = "rest", ...) {
   print(ascii(x, ...), type = type)
   invisible(x)
 }
 
+##' Test if \code{x} is an freq object
+##'
+##' @param x a freq object
 is.freq <- function(x)
   inherits(x, "freq")
 
+##' \code{prop.table} with cell
+##'
+##' @param x table
+##' @param margin margin
 prop.table2 <- function (x, margin = 0) {
   # 0 : cell
     if (margin != 0) 
@@ -54,6 +96,12 @@ prop.table2 <- function (x, margin = 0) {
     else x/sum(x)
 }
 
+##' Compute a contingency table
+##'
+##' @param x factor
+##' @param y factor
+##' @param margin margin
+##' @param useNA useNA
 tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always")) {
   n <- table(x, y, useNA = useNA)
   p <- mapply(prop.table2, list(n), margin, SIMPLIFY = FALSE)
@@ -68,6 +116,12 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always")) {
   results
 }
 
+##' Compute a contingency table (data.frame input)
+##'
+##' @param dfx data.frame
+##' @param dfy data.frame
+##' @param margin margin
+##' @param useNA useNA
 tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always")) {
   results <- lapply(dfy, function(y) lapply(dfx, tabular, y, margin = margin, useNA = useNA))
   
@@ -106,16 +160,45 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   results
 }
 
+##' Ascii for tabular object.
+##'
+##' Ascii method for tabular object (internal).
+##'
+##' @export
+##' @param x a tabular object
+##' @param format see \code{?ascii} in \code{ascii} package
+##' @param digits see \code{?ascii} in \code{ascii} package
+##' @param include.rownames see \code{?ascii} in \code{ascii} package
+##' @param include.colnames see \code{?ascii} in \code{ascii} package
+##' @param header see \code{?ascii} in \code{ascii} package
+##' @param lgroup see \code{?ascii} in \code{ascii} package
+##' @param n.lgroup see \code{?ascii} in \code{ascii} package
+##' @param tgroup see \code{?ascii} in \code{ascii} package
+##' @param n.tgroup see \code{?ascii} in \code{ascii} package
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), ...) {
   class(x) <- class(x)[-1]
 
   ascii:::ascii(x, lgroup = lgroup, n.lgroup = n.lgroup, tgroup = tgroup, n.tgroup = n.tgroup, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
+##' Print tabular object.
+##'
+##' Print tabular object (internal).
+##'
+##' @export
+##' @param x a tabular object
+##' @param type type of output (see \code{?ascii} in \code{ascii} package)
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 print.tabular <- function(x, type = "rest", ...) {
   print(ascii:::ascii(x, ...), type = type)
   invisible(x)
 }
 
+##' Test if \code{x} is an tabular object
+##'
+##' @param x a tabular object
 is.tabular <- function(x)
   inherits(x, "tabular")

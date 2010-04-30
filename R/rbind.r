@@ -1,3 +1,6 @@
+##' Rbind for list
+##'
+##' @param l a list
 rbind.list <- function(l) {
   n <- length(l)
   results <- NULL
@@ -7,6 +10,9 @@ rbind.list <- function(l) {
   results
 }
 
+##' Cbind for list
+##'
+##' @param l a list
 cbind.list <- function(l) {
   n <- length(l)
   results <- NULL

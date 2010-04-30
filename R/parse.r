@@ -1,12 +1,21 @@
+##' Remove blank in a formula
+##'
+##' @param formula formula (character)
 remove_blank <- function(formula) {
   gsub(" ", "", formula)
 }
 
-remove_var <- function(formula) {
-  formula <- remove_blank(formula)
-  gsub("(-.*)([\\+\\~]?)", "\\2", formula)
-}
+# Remove a variable in a formula (not used ?)
+#
+# @param formula formula (character)
+# remove_var <- function(formula) {
+#   formula <- remove_blank(formula)
+#   gsub("(-.*)([\\+\\~]?)", "\\2", formula)
+# }
 
+##' Separate left and right part of a formula
+##'
+##' @param formula formula (character)
 left_right<- function(formula) {
   formula <- remove_blank(formula)
   lr <- unlist(strsplit(formula, "~"))
@@ -29,12 +38,19 @@ left_right<- function(formula) {
   lr
 }
 
+##' Check if a variable is repeated several times in a formula
+##'
+##' @param formula formula (character)
 check_formula <- function (formula) {
   vars <- unlist(left_right(formula)[c("left", "right")])
   if (length(unique(vars)) < length(vars)) 
     warning("Variable(s) repeated several times: ", paste(names(table(vars))[table(vars) > 1], collapse = ", "), call. = FALSE)
 }
 
+##' Expand ... in a formula
+##'
+##' @param formula formula (character)
+##' @param varnames variables names
 expand_formula <- function(formula, varnames) {
   formula <- remove_blank(formula)
   vars <- all.vars(as.formula(formula))
@@ -46,12 +62,20 @@ expand_formula <- function(formula, varnames) {
   as.character(formula)
 }
 
+##' Parse a formula
+##'
+##' @param formula formula (character)
+##' @param varnames variables names
 parse_formula <- function(formula, varnames) {
   check_formula(formula)
   formula <- expand_formula(formula, varnames)
   left_right(formula)
 }
 
+##' Parse data
+##'
+##' @param formula formula (character)
+##' @param data data
 parse_data <- function(formula, data) {
   vars <- unlist(left_right(formula))
   vars <- vars[vars != "."]

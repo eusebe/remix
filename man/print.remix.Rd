@@ -1,36 +1,13 @@
 \name{print.remix}
 \alias{print.remix}
-\title{
-  Print remix object.
-}
-\description{
-  Print remix object.
-}
-\usage{
-  print.remix(x, type = "rest", caption.level = 1:3, ...)
-}
-\arguments{
-  \item{x}{
-    A remix object.
-  }
-  \item{type}{
-    type of output (see \code{?ascii} in \code{ascii} package)
-  }
-  \item{caption.level}{
-    captions levels (see \code{?ascii} in \code{ascii} package)
-  }
-  \item{\dots}{
-    Not used
-  }
-}
-
-\author{
-David Hajage
-}
-
-\seealso{
-  \code{\link{remix}}
-}
-
+\title{Print a remix object...}
+\usage{print.remix(x, type="rest", caption.level=1:3, ...)}
+\description{Print a remix object}
+\details{Print remix object using ascii package}
+\author{David Hajage}
 \keyword{univar}
-
+\arguments{\item{x}{a remix object}
+\item{type}{type of output. See \code{?ascii} in \code{ascii} package}
+\item{caption.level}{see \code{?ascii} in \code{ascii} package}
+\item{\dots}{other arguments passed to \code{ascii} (all except \code{caption}
+which has no effect)}}

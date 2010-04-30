@@ -1,3 +1,6 @@
+##' Concatenate functions
+##'
+##' @param \dots functions
 funs2fun <- function(...) {
   fnames <- as.character(match.call()[-1])
   fs <- list(...)
@@ -13,14 +16,27 @@ funs2fun <- function(...) {
   }
 }
 
+##' Return the number of non NA observations
+##'
+##' @param x a vector
+##' @param na.rm not used
 n <- function(x, na.rm = FALSE) {
   sum(!is.na(x))
 }
 
+##' Return the number of NA observations
+##'
+##' @param x a vector
+##' @param na.rm not used
 na <- function(x, na.rm = FALSE) {
   sum(is.na(x))
 }
 
+##' Compute summary statistics
+##'
+##' @param x numeric object
+##' @param funs functions
+##' @param \dots passed to funs
 summarize <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
@@ -40,6 +56,11 @@ summarize <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
   results
 }
 
+##' Compute summary statistics (data.frame input)
+##'
+##' @param df a data.frame
+##' @param funs functions
+##' @param \dots passed to funs
 summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
@@ -52,6 +73,19 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   results
 }
 
+##' Ascii for summarize object.
+##'
+##' Ascii method for summarize object (internal).
+##'
+##' @export
+##' @param x a summarize object
+##' @param format see \code{?ascii} in \code{ascii} package
+##' @param digits see \code{?ascii} in \code{ascii} package
+##' @param include.rownames see \code{?ascii} in \code{ascii} package
+##' @param include.colnames see \code{?ascii} in \code{ascii} package
+##' @param header see \code{?ascii} in \code{ascii} package
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 ascii.summarize <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...) {
   if (is.null(nrow(x))) {
     x <- t(x)
@@ -60,14 +94,33 @@ ascii.summarize <- function(x, format = "nice", digits = 5, include.rownames = T
   ascii:::ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
+##' Print summarize object.
+##'
+##' Print summarize object (internal).
+##'
+##' @export
+##' @param x a summarize object
+##' @param type type of output (see \code{?ascii} in \code{ascii} package)
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 print.summarize <- function(x, type = "rest", ...) {
   print(ascii(x, ...), type = type)
   invisible(x)
 }
 
+##' Test if \code{x} is a summarize object
+##'
+##' @param x a summarize object
 is.summarize <- function(x)
   inherits(x, "summarize")
 
+##' Compute summary statistics according to a factor
+##'
+##' @param x numeric object
+##' @param by factor
+##' @param funs functions
+##' @param useNA useNA
+##' @param \dots passed to funs
 summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
@@ -102,6 +155,13 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
   results
 }
 
+##' Compute summary statistics according to a factor (data.frame input)
+##'
+##' @param df data.frame
+##' @param by data.frame
+##' @param funs fuctions
+##' @param useNA useNA
+##' @param \dots passed to funs
 summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
@@ -147,6 +207,21 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
   results
 }
 
+##' Ascii for summarize.by object.
+##'
+##' Ascii method for summarize.by object (internal).
+##'
+##' @export
+##' @param x a summarize.by object
+##' @param format see \code{?ascii} in \code{ascii} package
+##' @param digits see \code{?ascii} in \code{ascii} package
+##' @param include.rownames see \code{?ascii} in \code{ascii} package
+##' @param include.colnames see \code{?ascii} in \code{ascii} package
+##' @param header see \code{?ascii} in \code{ascii} package
+##' @param lgroup see \code{?ascii} in \code{ascii} package
+##' @param n.lgroup see \code{?ascii} in \code{ascii} package
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
   xx <- NULL
   for (i in 1:length(x)) {
@@ -159,20 +234,42 @@ ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames 
   ascii:::ascii(xx, lgroup = lgroup, n.lgroup = n.lgroup, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
+##' Print summarize.by object.
+##'
+##' Print summarize.by object (internal).
+##'
+##' @export
+##' @param x a summarize.by object
+##' @param type type of output (see \code{?ascii} in \code{ascii} package)
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 print.summarize.by <- function(x, type = "rest", ...) {
   print(ascii(x, ...), type = type)
   invisible(x)
 }
 
+##' Test if \code{x} is a summarize.by object
+##'
+##' @param x a summarize.by object
 is.summarize.by <- function(x)
   inherits(x, "summarize.by")
 
+##' Compute correlation
+##'
+##' @param x numerical object
+##' @param y numerical object
+##' @param method method
 correlation <- function(x, y, method = c("pearson", "kendall", "spearman")) {
   results <- cor.test(x, y, method = method)$estimate
   class(results) <- c("correlation", "matrix")
   results
 }
 
+##' Compute correlation (data.frame input)
+##'
+##' @param dfx data.frame
+##' @param dfy data.frame
+##' @param method method
 correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "spearman")) {
   results <- sapply(dfy, function(y) sapply(dfx, correlation, y, method = method))
   if (ncol(dfx) == 1) {
@@ -184,15 +281,40 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
   results
 }
 
+##' Ascii for correlation object.
+##'
+##' Ascii method for correlation object (internal).
+##'
+##' @export
+##' @param x a correlation object
+##' @param format see \code{?ascii} in \code{ascii} package
+##' @param digits see \code{?ascii} in \code{ascii} package
+##' @param include.rownames see \code{?ascii} in \code{ascii} package
+##' @param include.colnames see \code{?ascii} in \code{ascii} package
+##' @param header see \code{?ascii} in \code{ascii} package
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 ascii.correlation <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...) {
   class(x) <- class(x)[-1]
   ascii:::ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
+##' Print correlation object.
+##'
+##' Print correlation object (internal).
+##'
+##' @export
+##' @param x a correlation object
+##' @param type type of output (see \code{?ascii} in \code{ascii} package)
+##' @param \dots other arguments passed to \code{ascii}
+##' @author David Hajage
 print.correlation <- function(x, type = "rest", ...) {
   print(ascii(x, ...), type = type)
   invisible(x)
 }
 
+##' Test if \code{x} is a correlation object
+##'
+##' @param x a correlation object
 is.correlation <- function(x)
   inherits(x, "correlation")
