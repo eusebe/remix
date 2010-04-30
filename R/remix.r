@@ -3,11 +3,12 @@
 ##' @param x x
 ##' @param y y
 ##' @param funs funs
-##' @param \dots \dots
+##' @param ... \dots
 ##' @param cum cum
 ##' @param margin margin
 ##' @param useNA useNA
 ##' @param method method
+##' @author David Hajage
 ##' @keywords internal
 cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
   if (!is.character(funs)) {
@@ -57,11 +58,12 @@ cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = F
 ##' @param x x
 ##' @param y y
 ##' @param funs funs
-##' @param \dots \dots
+##' @param ... \dots
 ##' @param cum cum
 ##' @param margin margin
 ##' @param useNA useNA
 ##' @param method method
+##' @author David Hajage
 ##' @keywords internal
 cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
 
@@ -84,6 +86,7 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
 ##'
 ##' @param vars vars
 ##' @param numdata numdata
+##' @author David Hajage
 ##' @keywords internal
 regroup <- function(vars, numdata) {
   vars <- strsplit(sub("(cbind\\()(.*)(\\))", "\\2", vars), ",")
@@ -112,22 +115,22 @@ regroup <- function(vars, numdata) {
 ##' A quick and easy function for describing datasets.
 ##'
 ##' @export
-##'
 ##' @param formula a formula (see Details).
 ##' @param data a data.frame.
-##' @param funs functions for describing numeric variable.
-##'   Can be \code{c(fun1, fun2, fun3)} or
-##'   \code{c("fun1", "fun2", "fun3")} or a list.
-##' @param \dots further arguments (all passed to funs),
-##'   for example \code{na.rm = TRUE}\dots.
+##' @param funs functions for describing numeric variable.   Can be
+##' \code{c(fun1, fun2, fun3)} or   \code{c("fun1", "fun2", "fun3")}
+##' or a list.
+##' @param ... further arguments (all passed to funs),   for example
+##' \code{na.rm = TRUE}\dots.
 ##' @param cum should cumulated frequencies be reported ?
-##' @param margin index, or vector of indices to generate proportion in frequency
-##'   tables (0: cell, 1: row, 2: col).
+##' @param margin index, or vector of indices to generate proportion
+##' in frequency   tables (0: cell, 1: row, 2: col).
 ##' @param useNA whether to include NA as a level (factor)
-##' @param method a character string indicating which correlation coefficient is to be
-##'   used. One of \code{"pearson"}, \code{"kendall"}, or \code{"spearman"}, 
-##'   can be abbreviated.
-##' @note The formula has the following format: \code{x_1 + x_2 + ... ~ y_1 +
+##' @param method a character string indicating which correlation
+##' coefficient is to be   used. One of \code{"pearson"},
+##' \code{"kendall"}, or \code{"spearman"},    can be abbreviated.
+##' @note
+##'   The formula has the following format: \code{x_1 + x_2 + ... ~ y_1 +
 ##'   y_2 + ... | z_1 + z_2 + ...}
 ##'
 ##'   There are a couple of special variables: \code{...} represents all
@@ -151,7 +154,8 @@ regroup <- function(vars, numdata) {
 ##'   You can exclude one or more variables from the formula with \code{-}.
 ##'   For example: \code{... - var1 - var2 ~ .} remove \code{var1} and
 ##'   \code{var2} from the formula.
-##' @return A remix object, basically a list with descriptive tables. It uses
+##' @return
+##'   A remix object, basically a list with descriptive tables. It uses
 ##'   \code{ascii} package for printing output, and can be use with
 ##'   \code{ascii} function.
 ##' @author David Hajage, inspired by the design and the code of
@@ -161,7 +165,8 @@ regroup <- function(vars, numdata) {
 ##' @examples
 ##' parwidth <- getOption("width")
 ##' options(width = 100)
-##' 
+##'
+##' library(remix)
 ##' remix(data = iris)
 ##' remix(cbind(...) ~ ., iris[, sapply(iris, is.numeric)], funs = c(median, mad, min, max))
 ##' remix(cbind(Sepal.Length, I(Sepal.Width^2)) ~ Species, iris, funs = quantile, probs = c(1/3, 2/3))
@@ -172,7 +177,9 @@ regroup <- function(vars, numdata) {
 ##' remix(alcgp ~ tobgp, esoph, cum = TRUE)
 ##' remix(agegp ~ . | alcgp + tobgp, esoph)
 ##' remix(agegp ~ . | alcgp:tobgp, esoph)
+##' 
 ##' options(width = parwidth)
+##' @keywords univar
 remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
   
   if (is.formula(formula))
@@ -251,7 +258,7 @@ remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n
 ##' @param caption.level see \code{?ascii} in \code{ascii} package
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
-##' @param \dots other arguments passed to \code{ascii} (all except \code{caption}
+##' @param ... other arguments passed to \code{ascii} (all except \code{caption}
 ##'    which has no effect)
 ##' @author David Hajage
 ##' @keywords univar
@@ -305,7 +312,7 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
 ##' @param x a remix object
 ##' @param type type of output. See \code{?ascii} in \code{ascii} package
 ##' @param caption.level see \code{?ascii} in \code{ascii} package
-##' @param \dots other arguments passed to \code{ascii} (all except \code{caption}
+##' @param ... other arguments passed to \code{ascii} (all except \code{caption}
 ##'    which has no effect)
 ##' @author David Hajage
 ##' @keywords univar
@@ -318,8 +325,8 @@ print.remix <- function(x, type = "rest", caption.level = 1:3, ...) {
 ##'
 ##' Test if \code{x} is an remix object
 ##'
-##' @export
 ##' @param x a remix object
-##' author David Hajage
+##' @author David Hajage
+##' @keywords internal
 is.remix <- function(x)
     inherits(x, "remix")

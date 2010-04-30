@@ -1,6 +1,8 @@
 ##' Rbind for list
 ##'
 ##' @param l a list
+##' @author David Hajage
+##' @keywords internal
 rbind.list <- function(l) {
   n <- length(l)
   results <- NULL
@@ -13,6 +15,8 @@ rbind.list <- function(l) {
 ##' Cbind for list
 ##'
 ##' @param l a list
+##' @author David Hajage
+##' @keywords internal
 cbind.list <- function(l) {
   n <- length(l)
   results <- NULL

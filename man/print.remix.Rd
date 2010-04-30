@@ -9,5 +9,5 @@
 \arguments{\item{x}{a remix object}
 \item{type}{type of output. See \code{?ascii} in \code{ascii} package}
 \item{caption.level}{see \code{?ascii} in \code{ascii} package}
-\item{\dots}{other arguments passed to \code{ascii} (all except \code{caption}
+\item{...}{other arguments passed to \code{ascii} (all except \code{caption}
 which has no effect)}}

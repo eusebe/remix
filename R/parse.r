@@ -1,6 +1,8 @@
 ##' Remove blank in a formula
 ##'
 ##' @param formula formula (character)
+##' @author David Hajage
+##' @keywords internal
 remove_blank <- function(formula) {
   gsub(" ", "", formula)
 }
@@ -16,6 +18,8 @@ remove_blank <- function(formula) {
 ##' Separate left and right part of a formula
 ##'
 ##' @param formula formula (character)
+##' @author David Hajage
+##' @keywords internal
 left_right<- function(formula) {
   formula <- remove_blank(formula)
   lr <- unlist(strsplit(formula, "~"))
@@ -41,6 +45,8 @@ left_right<- function(formula) {
 ##' Check if a variable is repeated several times in a formula
 ##'
 ##' @param formula formula (character)
+##' @author David Hajage
+##' @keywords internal
 check_formula <- function (formula) {
   vars <- unlist(left_right(formula)[c("left", "right")])
   if (length(unique(vars)) < length(vars)) 
@@ -51,6 +57,8 @@ check_formula <- function (formula) {
 ##'
 ##' @param formula formula (character)
 ##' @param varnames variables names
+##' @author David Hajage
+##' @keywords internal
 expand_formula <- function(formula, varnames) {
   formula <- remove_blank(formula)
   vars <- all.vars(as.formula(formula))
@@ -66,6 +74,8 @@ expand_formula <- function(formula, varnames) {
 ##'
 ##' @param formula formula (character)
 ##' @param varnames variables names
+##' @author David Hajage
+##' @keywords internal
 parse_formula <- function(formula, varnames) {
   check_formula(formula)
   formula <- expand_formula(formula, varnames)
@@ -76,6 +86,8 @@ parse_formula <- function(formula, varnames) {
 ##'
 ##' @param formula formula (character)
 ##' @param data data
+##' @author David Hajage
+##' @keywords internal
 parse_data <- function(formula, data) {
   vars <- unlist(left_right(formula))
   vars <- vars[vars != "."]
