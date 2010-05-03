@@ -194,6 +194,7 @@ remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n
   parsed <- parse_formula(formula, varnames)
   
   data <-   parse_data(expand_formula(formula, varnames), data)
+  names(data) <- remove_blank(names(data))
   varform <- names(data)
 
   numdata <- varform[sapply(data, is.numeric)]
