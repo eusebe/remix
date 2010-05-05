@@ -89,8 +89,8 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
 ##' @author David Hajage
 ##' @keywords internal
 regroup <- function(vars, numdata) {
-  vars <- strsplit(sub("(cbind\\()(.*)(\\))", "\\2", vars), ",")
-  unlist(lapply(vars, function(x) {
+  vars <- lapply(strsplit(sub("(cbind\\()(.*)(\\))", "\\2", vars), ","), remove_blank)
+  results <- unlist(lapply(vars, function(x) {
     if (!all(x %in% numdata) | !all(!(x %in% numdata))) {
       if (length(x[x %in% numdata]) == 1)
         xx <- x[x %in% numdata]
@@ -108,6 +108,7 @@ regroup <- function(vars, numdata) {
     }
     xx[xx != "cbind()"]
   }))
+  results
 }
 
 ##' Remix and describe.
@@ -150,10 +151,6 @@ regroup <- function(vars, numdata) {
 ##'   together with \code{cbind(var1, var2, var3)}, they will be grouped in the
 ##'   same table. \code{cbind(...)} works (ie regroups all variables of the same
 ##'   type).
-##'
-##'   You can exclude one or more variables from the formula with \code{-}.
-##'   For example: \code{... - var1 - var2 ~ .} remove \code{var1} and
-##'   \code{var2} from the formula.
 ##' @return
 ##'   A remix object, basically a list with descriptive tables. It uses
 ##'   \code{ascii} package for printing output, and can be use with

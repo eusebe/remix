@@ -7,39 +7,42 @@ remove_blank <- function(formula) {
   gsub(" ", "", formula)
 }
 
-# Remove a variable in a formula (not used ?)
-#
-# @param formula formula (character)
-# remove_var <- function(formula) {
-#   formula <- remove_blank(formula)
-#   gsub("(-.*)([\\+\\~]?)", "\\2", formula)
-# }
-
-##' Separate left and right part of a formula
+##' Separate left, right and by part of a formula
 ##'
 ##' @param formula formula (character)
 ##' @author David Hajage
 ##' @keywords internal
-left_right<- function(formula) {
-  formula <- remove_blank(formula)
-  lr <- unlist(strsplit(formula, "~"))
-  lr <- c(lr[1], unlist(strsplit(lr[2], "\\|")))
-  lr <- strsplit(lr, "\\+")
-  lr <- lapply(lr, function(x) {
-    y <- strsplit(x, "-")
-    unlist(lapply(y, function(y) y[1]))
-  })
-  if (length(lr) == 2)
-    lr <- c(lr, ".")
-    
-  names(lr) <- c("left", "right", "by")
-  if (all(lr$by == "."))
-    lr$by <- "."
-  if (length(lr$by) > 1)
-    lr$by <- lr$by[lr$by != "."]
-  lr$by <- unlist(strsplit(gsub("(cbind *\\()(.*)(\\))", "\\2", lr$by), ","))
-
-  lr
+left_right <- function(formula) {
+  if (is.character(formula)) {
+    formula <- as.formula(formula)
+  }
+  
+  left <- formula[[2]]
+  if (length(left) == 1) {
+    left <- deparse(left)
+  } else {
+    left <- attr(terms(formula(paste("~", deparse(left))), allowDotAsName = TRUE), "term.labels")
+  }
+  right <- formula[[3]]
+  if (length(right) == 1) {
+    right <- deparse(right)
+    by <- "."
+  } else {
+    if (right[[1]] == "|") {
+      by <- right[[3]]
+      if (length(by) == 1) {
+        by <- deparse(by)
+      } else {
+        by <- attr(terms(formula(paste("~", deparse(by))), allowDotAsName = TRUE), "term.labels")
+        by <- by[by != "."]
+      }
+      right <- right[[2]]
+    } else {
+      by <- "."
+    }
+    right <- attr(terms(formula(paste("~", deparse(right))), allowDotAsName = TRUE), "term.labels")
+  }
+  return(list(left = left, right = right, by = by))
 }
 
 ##' Check if a variable is repeated several times in a formula
@@ -48,7 +51,10 @@ left_right<- function(formula) {
 ##' @author David Hajage
 ##' @keywords internal
 check_formula <- function (formula) {
-  vars <- unlist(left_right(formula)[c("left", "right")])
+  lr <- left_right(formula)[c("left", "right")]
+  if (any(lr$left == ".") & any(lr$right == "."))
+    stop("You can't cross nothing with nothing (. ~ .)")
+  vars <- unlist(lr)
   if (length(unique(vars)) < length(vars)) 
     warning("Variable(s) repeated several times: ", paste(names(table(vars))[table(vars) > 1], collapse = ", "), call. = FALSE)
 }
@@ -93,7 +99,6 @@ parse_data <- function(formula, data) {
   vars <- vars[vars != "."]
   vars <- gsub("(cbind *\\()(.*)(\\))", "\\2", vars)
   vars <- unlist(strsplit(gsub("(cbind *\\()(.*)(\\))", "\\2", vars), ","))
-  ## vars <- gsub("c *\\(", "cbind(", vars) # mais ne donne pas les bons noms aux variables...
   formula <- paste("~", paste(vars, collapse = "+"), sep = "")
     
   results <- model.frame(formula, data, na.action = NULL)

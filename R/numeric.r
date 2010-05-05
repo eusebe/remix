@@ -81,7 +81,13 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
 
   dfl <- as.list(df)
   results <- t(sapply(dfl, summarize, funs = funs, ...))
+
   class(results) <- c("summarize", "matrix")
+  if (length(funs) == 1) {
+    dim(results) <- rev(dim(results))
+    rownames(results) <- names(dfl)
+    colnames(results) <- funs
+  }
   results
 }
 
