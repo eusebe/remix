@@ -25,11 +25,7 @@ summary table using \code{funs} according to the levels of
 You can group several variables of the same type (numeric or factor)
 together with \code{cbind(var1, var2, var3)}, they will be grouped in the
 same table. \code{cbind(...)} works (ie regroups all variables of the same
-type).
-
-You can exclude one or more variables from the formula with \code{-}.
-For example: \code{... - var1 - var2 ~ .} remove \code{var1} and
-\code{var2} from the formula.}
+type).}
 \value{A remix object, basically a list with descriptive tables. It uses
 \code{ascii} package for printing output, and can be use with
 \code{ascii} function.}
