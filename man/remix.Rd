@@ -10,7 +10,7 @@
 y_2 + ... | z_1 + z_2 + ...}
 
 There are a couple of special variables: \code{...} represents all
-other variables not used in the formula and "." represents no
+other variables not used in the formula and \code{.} represents no
 variable, so you can do \code{formula = var1 ~ .}.
 
 If \code{var1} is numeric, \code{var1 ~ .} produce a summary table
