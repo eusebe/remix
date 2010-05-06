@@ -7,10 +7,11 @@
 ##' @param cum cum
 ##' @param margin margin
 ##' @param useNA useNA
+##' @param revert whether to regroup factors or numeric variables when crossing factor with numeric variables
 ##' @param method method
 ##' @author David Hajage
 ##' @keywords internal
-cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
+cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), revert = FALSE, method = c("pearson", "kendall", "spearman")) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -20,10 +21,10 @@ cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = F
   
   if (!is.null(x) & !is.null(y)) {
     if (all(sapply(x, is.numeric)) & all(!sapply(y, is.numeric))) {
-      results <- summarize.data.frame.by(x, y, funs = funs, ..., useNA = useNA)
+      results <- summarize.data.frame.by(x, y, funs = funs, ..., useNA = useNA, revert = revert)
     }
     if (all(sapply(y, is.numeric)) & all(!sapply(x, is.numeric))) {
-      results <- summarize.data.frame.by(y, x, funs = funs, ..., useNA = useNA)
+      results <- summarize.data.frame.by(y, x, funs = funs, ..., useNA = useNA, revert = revert)
     }
     if (all(!sapply(x, is.numeric)) & all(!sapply(y, is.numeric))) {
       results <- tabular.data.frame(x, y, margin = margin, useNA = useNA)
@@ -62,10 +63,11 @@ cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = F
 ##' @param cum cum
 ##' @param margin margin
 ##' @param useNA useNA
+##' @param revert whether to regroup factors or numeric variables when crossing factor with numeric variables
 ##' @param method method
 ##' @author David Hajage
 ##' @keywords internal
-cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), method = c("pearson", "kendall", "spearman")) {
+cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), revert = FALSE, method = c("pearson", "kendall", "spearman")) {
 
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
@@ -79,7 +81,7 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
     y <- NULL
   }
 
-  cross(x = x, y = y, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, method = method)
+  cross(x = x, y = y, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, revert = revert, method = method)
 }
 
 ##' Regroup factors with factors, and numerical variables with numerical variables
@@ -127,6 +129,7 @@ regroup <- function(vars, numdata) {
 ##' @param margin index, or vector of indices to generate proportion
 ##' in frequency   tables (0: cell, 1: row, 2: col).
 ##' @param useNA whether to include NA as a level (factor)
+##' @param revert whether to regroup factors or numeric variables when crossing factor with numeric variables
 ##' @param method a character string indicating which correlation
 ##' coefficient is to be   used. One of \code{"pearson"},
 ##' \code{"kendall"}, or \code{"spearman"},    can be abbreviated.
@@ -177,7 +180,7 @@ regroup <- function(vars, numdata) {
 ##' 
 ##' options(width = parwidth)
 ##' @keywords univar
-remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = "no", method = c("pearson", "kendall", "spearman")) {
+remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, useNA = c("no", "ifany", "always"), revert = FALSE, method = c("pearson", "kendall", "spearman")) {
   
   if (is.formula(formula))
     formula <- deparse(formula, 500)
@@ -207,7 +210,7 @@ remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n
       y <- sub("(cbind\\()(.*)(\\))", "\\2", y)
       lapply(y, function(z) data[, strsplit(z, ",")[[1]], drop = FALSE])})
     
-    results <- llply(comb, cross_list, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, method = method)
+    results <- llply(comb, cross_list, funs = funs, ..., cum = cum, margin = margin, useNA = useNA, revert = revert, method = method)
     names(results) <- apply(eg, 1, paste, collapse = " ~ ")
   }
   
@@ -229,7 +232,7 @@ remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n
       lapply(y, function(z) p[, strsplit(z, ",")[[1]], drop = FALSE])})))
 
     results <- lapply(combby, function(x) lapply(x, function(comb) {
-      res <- llply(comb, cross_list, funs = funs, cum = cum, margin = margin, useNA = useNA, method = method)
+      res <- llply(comb, cross_list, funs = funs, cum = cum, margin = margin, useNA = useNA, revert = revert, method = method)
       names(res) <- apply(eg, 1, paste, collapse = " ~ ")
       res
     }))

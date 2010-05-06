@@ -188,9 +188,10 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
 ##' @param funs fuctions
 ##' @param ... passed to funs
 ##' @param useNA useNA
+##' @param revert whether to regroup factors or numeric variables when crossing factor with numeric variables
 ##' @author David Hajage
 ##' @keywords internal
-summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
+summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always"), revert = FALSE) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -204,11 +205,11 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
   nby <- ncol(by)
   namesby <- paste("by", 1:nby, sep = ".")
   fun <- function(df, funs = funs, ...) summarize.data.frame(df[, 1:(ncol(df)-nby), drop = FALSE], funs = funs, ...)
-  df <- data.frame(df, by, check.names = FALSE)
-  names(df) <- c(names(df)[1:(length(names(df))-nby)], namesby)
+  dff <- data.frame(df, by, check.names = FALSE)
+  names(dff) <- c(names(dff)[1:(length(names(dff))-nby)], namesby)
   results <- NULL
   for (i in 1:nby) {
-    dfi <- df
+    dfi <- dff
     if (useNA[1] == "no") {
       dfi <- dfi[!is.na(by[, i]), ]
     }
@@ -221,16 +222,24 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
     y[is.na(y)] <- "NA"
     y
   })
-  
-  lgroup <- list(unlist(r), names(results))
-  nr <- nrow(results[[1]][[1]])
-  n.lgroup <- list(nr, nr*sapply(r, length))
 
+  if (!revert) {
+    lgroup <- list(rep(names(df), length(unlist(r))), unlist(r), names(results))
+    nr <- nrow(results[[1]][[1]])
+    n.lgroup <- list(1, nr, nr*sapply(r, length))
+  } else {
+    lgroup <- list(unlist(lapply(r, rep, ncol(df))), rep(names(df), ncol(by)), names(results))
+    nr <- rep(sapply(results, length), each = length(results))
+    nrr <- sapply(results, length)*ncol(by)
+    n.lgroup <- list(1, nr, nrr)
+  }
+  
   class(results) <- c("summarize.by", "list")
   attr(results, "split_type") <- NULL
   attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
   attr(results, "n.lgroup") <- n.lgroup
+  attr(results, "revert") <- revert
   
   results
 }
@@ -251,15 +260,18 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
-ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
-  xx <- NULL
-  for (i in 1:length(x)) {
-    for (j in 1:length(x[[i]])) {
-      xx <- rbind(xx, x[[i]][[j]])
+ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
+  if (attr(x, "revert")) {
+    xx <- do.call(rbind, lapply(x, function(y) do.call(ascii:::interleave.matrix, y)))
+  } else {
+    xx <- NULL
+    for (i in 1:length(x)) {
+      for (j in 1:length(x[[i]])) {
+        xx <- rbind(xx, x[[i]][[j]])
+      }
     }
   }
-
-  class(x) <- class(x)[-1]
+  
   ascii:::ascii(xx, lgroup = lgroup, n.lgroup = n.lgroup, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
