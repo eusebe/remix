@@ -47,7 +47,7 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
     if (useNA != "no")
       levels(addNA(x))
     else
-      levels(x)})) # sub("(.+)(\\:)(.+)", "\\3", rownames(results))
+      levels(x)}))
   class(results) <- c("freq", "data.frame")
   results
 }
