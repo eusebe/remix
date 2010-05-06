@@ -313,6 +313,8 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
 ##' @param x a remix object
 ##' @param type type of output. See \code{?ascii} in \code{ascii} package
 ##' @param caption.level see \code{?ascii} in \code{ascii} package
+##' @param lstyle see \code{?ascii} in \code{ascii} package
+##' @param tstyle see \code{?ascii} in \code{ascii} package
 ##' @param ... other arguments passed to \code{ascii} (all except \code{caption}
 ##'    which has no effect)
 ##' @author David Hajage

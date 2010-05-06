@@ -82,6 +82,7 @@ ascii.freq <- function(x, format = "nice", digits = 5, include.rownames = TRUE, 
 ##' @param x a freq object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)
+##' @param lstyle see \code{?ascii} in \code{ascii} package
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
@@ -210,6 +211,8 @@ ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FAL
 ##' @param x a tabular object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)
+##' @param lstyle see \code{?ascii} in \code{ascii} package
+##' @param tstyle see \code{?ascii} in \code{ascii} package
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
