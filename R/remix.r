@@ -263,7 +263,7 @@ remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n
 ##'    which has no effect)
 ##' @author David Hajage
 ##' @keywords univar
-ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", digits = 5, ...) {
+ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", digits = 2, ...) {
   caption.level <- rep(caption.level, length = 3)
   caption.level1 <- caption.level[1]
   caption.level2 <- caption.level[2]
@@ -317,8 +317,8 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
 ##'    which has no effect)
 ##' @author David Hajage
 ##' @keywords univar
-print.remix <- function(x, type = "rest", caption.level = 1:3, ...) {
-  print(ascii(x, caption.level = caption.level, ...), type = type)
+print.remix <- function(x, type = "rest", caption.level = 1:3, lstyle = "", tstyle = "", ...) {
+  print(ascii(x, caption.level = caption.level, lstyle = lstyle, tstyle = tstyle, ...), type = type)
   invisible(x)
 }
 

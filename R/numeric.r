@@ -125,8 +125,8 @@ ascii.summarize <- function(x, format = "nice", digits = 5, include.rownames = T
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords internal
-print.summarize <- function(x, type = "rest", ...) {
-  print(ascii(x, ...), type = type)
+print.summarize <- function(x, type = "rest", lstyle = "", ...) {
+  print(ascii(x, lstyle = lstyle, ...), type = type)
   invisible(x)
 }
 
@@ -285,8 +285,8 @@ ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames 
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords internal
-print.summarize.by <- function(x, type = "rest", ...) {
-  print(ascii(x, ...), type = type)
+print.summarize.by <- function(x, type = "rest", lstyle = "", ...) {
+  print(ascii(x, lstyle = lstyle, ...), type = type)
   invisible(x)
 }
 

@@ -81,8 +81,8 @@ ascii.freq <- function(x, format = "nice", digits = 5, include.rownames = TRUE, 
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
-print.freq <- function(x, type = "rest", ...) {
-  print(ascii(x, ...), type = type)
+print.freq <- function(x, type = "rest", lstyle = "", ...) {
+  print(ascii(x, lstyle = lstyle, ...), type = type)
   invisible(x)
 }
 
@@ -209,8 +209,8 @@ ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FAL
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
-print.tabular <- function(x, type = "rest", ...) {
-  print(ascii:::ascii(x, ...), type = type)
+print.tabular <- function(x, type = "rest", lstyle = "", tstyle = "", ...) {
+  print(ascii:::ascii(x, lstyle = lstyle, tstyle = tstyle, ...), type = type)
   invisible(x)
 }
 
