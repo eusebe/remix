@@ -1,0 +1,21 @@
+remix
+=====
+David Hajage <dhajage[at]gmail[dot]com>
+
+== Without +ascii+ package
+
+<<>>=
+library(remix)
+remix(data = esoph)
+remix(cbind(...) ~ tobgp, esoph)
+remix(cbind(...) ~ Species, iris)
+@
+
+== With +ascii+ package
+
+<<results = ascii>>=
+library(remix)
+remix(data = esoph)
+remix(cbind(...) ~ tobgp, esoph)
+remix(cbind(...) ~ Species, iris)
+@
