@@ -43,7 +43,11 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   class(results) <- c("data.frame", "freq")
   attr(results, "lgroup") <- rnames
   attr(results, "n.lgroup") <- nrows
-  attr(results, "rownames") <- sub("(.+)(\\:)(.+)", "\\3", rownames(results))
+  attr(results, "rownames") <- unlist(lapply(df, function(x) {
+    if (useNA != "no")
+      levels(addNA(x))
+    else
+      levels(x)})) # sub("(.+)(\\:)(.+)", "\\3", rownames(results))
   class(results) <- c("freq", "data.frame")
   results
 }
