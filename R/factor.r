@@ -44,7 +44,7 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   attr(results, "lgroup") <- rnames
   attr(results, "n.lgroup") <- nrows
   attr(results, "rownames") <- unlist(lapply(df, function(x) {
-    if (useNA != "no")
+    if (useNA[1] != "no")
       levels(addNA(x))
     else
       levels(x)}))
