@@ -8,7 +8,8 @@ Maintainer: David Hajage <dhajage@gmail.com>
 Description: remix provides remix, a quick and easy function for
     describing datasets. It can be view as a mix of cast (in package
     reshape) and summary.formula (in package Hmisc).
-Depends: plyr, ascii
+Depends: plyr, ascii (>= 0.6-1)
 License: GPL (>= 2)
+URL: http://eusebe.github.com/remix/, http://github.com/eusebe/remix/
 LazyLoad: yes
 Collate: 'factor.r' 'numeric.r' 'parse.r' 'rbind.r' 'remix.r'
