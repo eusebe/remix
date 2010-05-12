@@ -19,28 +19,28 @@ left_right <- function(formula) {
   
   left <- formula[[2]]
   if (length(left) == 1) {
-    left <- deparse(left)
+    left <- deparse(left, 500)
   } else {
-    left <- attr(terms(formula(paste("~", deparse(left))), allowDotAsName = TRUE), "term.labels")
+    left <- attr(terms(formula(paste("~", deparse(left, 500))), allowDotAsName = TRUE), "term.labels")
   }
   right <- formula[[3]]
   if (length(right) == 1) {
-    right <- deparse(right)
+    right <- deparse(right, 500)
     by <- "."
   } else {
     if (right[[1]] == "|") {
       by <- right[[3]]
       if (length(by) == 1) {
-        by <- deparse(by)
+        by <- deparse(by, 500)
       } else {
-        by <- attr(terms(formula(paste("~", deparse(by))), allowDotAsName = TRUE), "term.labels")
+        by <- attr(terms(formula(paste("~", deparse(by, 500))), allowDotAsName = TRUE), "term.labels")
         by <- by[by != "."]
       }
       right <- right[[2]]
     } else {
       by <- "."
     }
-    right <- attr(terms(formula(paste("~", deparse(right))), allowDotAsName = TRUE), "term.labels")
+    right <- attr(terms(formula(paste("~", deparse(right, 500))), allowDotAsName = TRUE), "term.labels")
   }
   return(list(left = left, right = right, by = by))
 }

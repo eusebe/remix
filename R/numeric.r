@@ -130,6 +130,19 @@ print.summarize <- function(x, type = "rest", lstyle = "", ...) {
   invisible(x)
 }
 
+##' as.data.frame for summarize object.
+##'
+##' as.data.frame for summarize object (internal).
+##'
+##' @export
+##' @param x a summarize object
+##' @param ... not used
+##' @author David Hajage
+##' @keywords internal
+as.data.frame.summarize <- function(x, ...) {
+  as.data.frame(unclass(x))
+}
+
 ##' Test if \code{x} is a summarize object
 ##'
 ##' @param x a summarize object
@@ -290,6 +303,39 @@ print.summarize.by <- function(x, type = "rest", lstyle = "", ...) {
   invisible(x)
 }
 
+##' as.data.frame for summarize.by object.
+##'
+##' as.data.frame for summarize.by object (internal).
+##'
+##' @export
+##' @param x a summarize.by object
+##' @param ... not used
+##' @author David Hajage
+##' @keywords internal
+as.data.frame.summarize.by <- function(x, ...) {
+  if (attr(x, "revert")) {
+    xx <- do.call(rbind, lapply(x, function(y) do.call(ascii:::interleave.matrix, y)))
+    lgroup <- attr(x, "lgroup")
+    n.lgroup <- attr(x, "n.lgroup")
+    lgroup[[2]] <- unlist(mapply(rep, lgroup[[2]], each = n.lgroup[[2]], SIMPLIFY = FALSE))
+    lgroup[[3]] <- unlist(mapply(rep, lgroup[[3]], n.lgroup[[3]], SIMPLIFY = FALSE))
+    xx <- data.frame(by = lgroup[[3]], var = lgroup[[2]], levels = lgroup[[1]], xx, row.names = NULL, check.names = FALSE)
+  } else {
+    xx <- NULL
+    for (i in 1:length(x)) {
+      for (j in 1:length(x[[i]])) {
+        xx <- rbind(xx, x[[i]][[j]])
+      }
+    }
+    lgroup <- attr(x, "lgroup")
+    n.lgroup <- attr(x, "n.lgroup")
+    lgroup[[2]] <- unlist(mapply(rep, lgroup[[2]], each = n.lgroup[[2]], SIMPLIFY = FALSE))
+    lgroup[[3]] <- unlist(mapply(rep, lgroup[[3]], n.lgroup[[3]], SIMPLIFY = FALSE))
+    xx <- data.frame(by = lgroup[[3]], levels = lgroup[[2]], var = lgroup[[1]], xx, row.names = NULL, check.names = FALSE)
+  }
+  xx
+}
+
 ##' Test if \code{x} is a summarize.by object
 ##'
 ##' @param x a summarize.by object
@@ -362,6 +408,19 @@ ascii.correlation <- function(x, format = "nice", digits = 5, include.rownames =
 print.correlation <- function(x, type = "rest", ...) {
   print(ascii(x, ...), type = type)
   invisible(x)
+}
+
+##' as.data.frame for correlation object.
+##'
+##' as.data.frame for correlation object (internal).
+##'
+##' @export
+##' @param x a correlation object
+##' @param ... not used
+##' @author David Hajage
+##' @keywords internal
+as.data.frame.correlation <- function(x, ...) {
+  as.data.frame(unclass(x))
 }
 
 ##' Test if \code{x} is a correlation object

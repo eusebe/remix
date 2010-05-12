@@ -17,10 +17,10 @@ freq <- function(x, useNA = c("no", "ifany", "always"), cum = FALSE) {
     n.cum <- NULL
     p.cum <- NULL
   }
-  results <- as.data.frame(cbind(n, p, n.cum, p.cum))
-  attr(results, "lgroup") <- rnames
-  attr(results, "n.lgroup") <- nrow(results)
-  class(results) <- c("freq", "data.frame")
+  results <- cbind(n, p, n.cum, p.cum)
+  attr(results, "lgroup") <- list(names(n), rnames)
+  attr(results, "n.lgroup") <- list(1, nrow(results))
+  class(results) <- c("freq", "matrix")
   results
 }
 
@@ -36,19 +36,16 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
   rnames <- names(dfl)
   results <- lapply(dfl, freq, useNA = useNA, cum = cum)
   nrows <- sapply(results, nrow)
-  nxx <- rep(rnames, nrows)
   results <- rbind.list(results)
-  rnamesrep <- paste(nxx, rownames(results), sep = ": ")
-  results <- data.frame(results, row.names = rnamesrep)
-  class(results) <- c("data.frame", "freq")
+
   attr(results, "lgroup") <- rnames
-  attr(results, "n.lgroup") <- nrows
-  attr(results, "rownames") <- unlist(lapply(df, function(x) {
+  attr(results, "n.lgroup") <- list(1, nrows)
+  attr(results, "lgroup") <- list(unlist(lapply(df, function(x) {
     if (useNA[1] != "no")
       levels(addNA(x))
     else
-      levels(x)}))
-  class(results) <- c("freq", "data.frame")
+      levels(x)})), rnames)
+  class(results) <- c("freq", "matrix")
   results
 }
 
@@ -69,9 +66,9 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE)
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
-ascii.freq <- function(x, format = "nice", digits = 5, include.rownames = TRUE, rownames = attr(x, "rownames"), include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
+ascii.freq <- function(x, format = "nice", digits = 3, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), ...) {
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.colnames = include.colnames, include.rownames = include.rownames, rownames = rownames, header = header, lgroup = lgroup, n.lgroup = n.lgroup, format = format, digits = digits, ...)
+  ascii:::ascii(x, include.colnames = include.colnames, include.rownames = include.rownames, header = header, lgroup = lgroup, n.lgroup = n.lgroup, format = format, digits = digits, ...)
 }
 
 ##' Print freq object.
@@ -89,6 +86,23 @@ ascii.freq <- function(x, format = "nice", digits = 5, include.rownames = TRUE, 
 print.freq <- function(x, type = "rest", lstyle = "", ...) {
   print(ascii(x, lstyle = lstyle, ...), type = type)
   invisible(x)
+}
+
+##' as.data.frame for freq object.
+##'
+##' as.data.frame for freq object (internal).
+##'
+##' @export
+##' @param x a freq object
+##' @param ... not used
+##' @author David Hajage
+##' @keywords internal
+as.data.frame.freq <- function(x, ...) {
+  xx <- unclass(x)
+  var <- unlist(mapply(rep, attr(x, "lgroup")[[2]], attr(x, "n.lgroup")[[2]], SIMPLIFY = FALSE))
+  levels <- attr(x, "lgroup")[[1]]
+  
+  data.frame(var = var, levels = levels, xx, row.names = NULL, check.names = FALSE)
 }
 
 ##' Test if \code{x} is an freq object
@@ -124,12 +138,12 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always")) {
   p <- mapply(prop.table2, list(n), margin, SIMPLIFY = FALSE)
   names(p) <- sapply(as.character(margin), function(x) switch(x, "0" = "cell", "1" = "row", "2" = "col"))
   results <- c(n = list(n), p)
-  results <- data.frame(do.call(ascii:::interleave.matrix, results), check.names = FALSE)
+  results <- do.call(ascii:::interleave.matrix, results)
   attr(results, "lgroup") <- list(rep(c("n", names(p)), nrow(n)), rownames(n))
   attr(results, "n.lgroup") <- list(1, 1+length(p))
   attr(results, "tgroup") <- NULL
   attr(results, "n.tgroup") <- NULL
-  class(results) <- c("tabular", "data.frame")
+  class(results) <- c("tabular", "matrix")
   results
 }
 
@@ -175,7 +189,7 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   attr(results, "tgroup") <- tgroup
   attr(results, "n.tgroup") <- n.tgroup
   
-  class(results) <- c("tabular", "data.frame")
+  class(results) <- c("tabular", "matrix")
   results
 }
 
@@ -219,6 +233,24 @@ ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FAL
 print.tabular <- function(x, type = "rest", lstyle = "", tstyle = "", ...) {
   print(ascii:::ascii(x, lstyle = lstyle, tstyle = tstyle, ...), type = type)
   invisible(x)
+}
+
+##' as.data.frame for tabular object.
+##'
+##' as.data.frame for tabular object (internal).
+##'
+##' @export
+##' @param x a tabular object
+##' @param ... not used
+##' @author David Hajage
+##' @keywords internal
+as.data.frame.tabular <- function(x, ...) {
+  xx <- unclass(x)
+  var <- unlist(mapply(rep, attr(x, "lgroup")[[3]], attr(x, "n.lgroup")[[3]], SIMPLIFY = FALSE))
+  levels <- unlist(mapply(rep, attr(x, "lgroup")[[2]], attr(x, "n.lgroup")[[2]], SIMPLIFY = FALSE))
+  margin <- attr(x, "lgroup")[[1]]
+  
+  data.frame(var = var, levels = levels, margin = margin, xx, row.names = NULL, check.names = FALSE)
 }
 
 ##' Test if \code{x} is an tabular object
