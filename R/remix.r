@@ -326,16 +326,18 @@ print.remix <- function(x, type = "rest", caption.level = 1:3, lstyle = "", tsty
 
 ##' Demix
 ##'
-##' Transfrom a remix object into a (list of) data.frame.
+##' Transfrom a remix object into a (list of) data.frame(s).
 ##'
 ##' @export
 ##' @param x a remix object
 ##'
 ##' @return
-##'   A data.frame, or a list of data.frame.
+##'   A list of data.frame.
 ##' @author David Hajage
 ##' @seealso \code{remix}
 ##' @examples
+##'   x <- remix(... ~ ., esoph, cum = TRUE)
+##'   demix(x)
 demix <- function(x) {
   if (all(attr(x, "by") == ".")) {
     result <- lapply(x, as.data.frame)
