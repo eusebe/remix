@@ -1,15 +1,50 @@
+##' \code{prop.table} with cell and propNA
+##'
+##' @param ... ...
+##' @param useNA useNA
+##' @param margin margin
+##' @param propNA propNA
+##' @author David Hajage
+##' @keywords internal
+prop.table2 <- function (..., useNA = c("no", "ifany", "always"), margin = 0, propNA = TRUE) {
+  n <- table(..., useNA = useNA)
+  nn <- n
+  if (!propNA) {
+    if (length(dim(nn)) == 2) {
+      nn[is.na(rownames(nn)), ] <- 0
+      nn[, is.na(colnames(nn))] <- 0
+    } else {
+      nn[is.na(names(nn))] <- 0
+    }
+  }
+  if (margin != 0) 
+      prop <- sweep(nn, margin, margin.table(nn, margin), "/", check.margin = FALSE)
+    else
+      prop <- nn/sum(nn)
+  if (!propNA) {
+    if (length(dim(prop)) == 2) {
+      prop[is.na(rownames(prop)), ] <- NA
+      prop[, is.na(colnames(prop))] <- NA
+    } else {
+      prop[is.na(names(prop))] <- NA
+    }
+  }
+  list(n = n, p = prop)
+}
+
 ##' Compute frequencies
 ##'
 ##' @param x factor
 ##' @param useNA useNA
+##' @param propNA propNA
 ##' @param cum logical
 ##' @author David Hajage
 ##' @keywords internal
-freq <- function(x, useNA = c("no", "ifany", "always"), cum = FALSE) {
+freq <- function(x, useNA = c("no", "ifany", "always"), propNA = TRUE, cum = FALSE) {
   rnames <- as.character(as.list(substitute(list(x)))[-1])
-  
-  n <- table(x, useNA = useNA)
-  p <- prop.table(n)
+  np <- prop.table2(x, useNA = useNA, propNA = propNA)
+  n <- np$n
+  p <- np$p
   if (cum) {
     n.cum <- cumsum(n)
     p.cum <- cumsum(p)
@@ -28,22 +63,22 @@ freq <- function(x, useNA = c("no", "ifany", "always"), cum = FALSE) {
 ##'
 ##' @param df data.frame
 ##' @param useNA useNA
+##' @param propNA propNA
 ##' @param cum logical
 ##' @author David Hajage
 ##' @keywords internal
-freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), cum = FALSE) {
+freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), propNA = TRUE, cum = FALSE) {
   dfl <- as.list(df)
   rnames <- names(dfl)
-  results <- lapply(dfl, freq, useNA = useNA, cum = cum)
+  results <- lapply(dfl, freq, useNA = useNA, propNA = propNA, cum = cum)
   nrows <- sapply(results, nrow)
   results <- rbind.list(results)
 
-  attr(results, "lgroup") <- rnames
   attr(results, "n.lgroup") <- list(1, nrows)
   attr(results, "lgroup") <- list(unlist(lapply(df, function(x) {
-    if (useNA[1] != "no")
+    if (useNA[1] == "always" | ((useNA[1] == "ifany") & any(is.na(x))))
       levels(addNA(x))
-    else
+    else 
       levels(x)})), rnames)
   class(results) <- c("freq", "matrix")
   results
@@ -112,30 +147,21 @@ as.data.frame.freq <- function(x, ...) {
 is.freq <- function(x)
   inherits(x, "freq")
 
-##' \code{prop.table} with cell
-##'
-##' @param x table
-##' @param margin margin
-##' @author David Hajage
-##' @keywords internal
-prop.table2 <- function (x, margin = 0) {
-  # 0 : cell
-    if (margin != 0) 
-        sweep(x, margin, margin.table(x, margin), "/", check.margin = FALSE)
-    else x/sum(x)
-}
-
 ##' Compute a contingency table
 ##'
 ##' @param x factor
 ##' @param y factor
 ##' @param margin margin
 ##' @param useNA useNA
+##' @param propNA propNA
 ##' @author David Hajage
 ##' @keywords internal
-tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always")) {
+tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE) {
   n <- table(x, y, useNA = useNA)
-  p <- mapply(prop.table2, list(n), margin, SIMPLIFY = FALSE)
+  ptable <- function(x, y, useNA, margin, propNA) {
+    prop.table2(x, y, useNA = useNA, margin = margin, propNA = propNA)$p
+  }
+  p <- mapply(ptable, x = list(x), y = list(y), margin = margin, useNA = useNA[1], propNA = propNA, SIMPLIFY = FALSE)
   names(p) <- sapply(as.character(margin), function(x) switch(x, "0" = "cell", "1" = "row", "2" = "col"))
   results <- c(n = list(n), p)
   results <- do.call(ascii:::interleave.matrix, results)
@@ -153,10 +179,11 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always")) {
 ##' @param dfy data.frame
 ##' @param margin margin
 ##' @param useNA useNA
+##' @param propNA propNA
 ##' @author David Hajage
 ##' @keywords internal
-tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always")) {
-  results <- lapply(dfy, function(y) lapply(dfx, tabular, y, margin = margin, useNA = useNA))
+tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE) {
+  results <- lapply(dfy, function(y) lapply(dfx, tabular, y, margin = margin, useNA = useNA, propNA = propNA))
   
   noms <- names(results[[1]])
   lgroup <- lapply(results[[1]], function(x) attr(x, "lgroup"))
