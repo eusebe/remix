@@ -10,7 +10,11 @@ funs2fun <- function(...) {
   function(x, ...) {
     results <- NULL
     for (i in 1:n) {
-      tmp <- match.fun(fs[[i]])(x, ...)
+      func <- match.fun(fs[[i]])
+      args <- formals(func)
+      if (all(names(args) != "..."))
+        formals(func) <- c(args, alist(...=))
+      tmp <- func(x, ...)
       names(tmp) <- paste(fnames[i], names(tmp))
       results <- c(results, tmp)
     }
