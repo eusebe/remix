@@ -9,12 +9,18 @@ funs2fun <- function(...) {
   n <- length(fs)
   function(x, ...) {
     results <- NULL
+    args <- list(...)
+    namesargs <- names(args)
     for (i in 1:n) {
       func <- match.fun(fs[[i]])
-      args <- formals(func)
-      if (all(names(args) != "..."))
-        formals(func) <- c(args, alist(...=))
-      tmp <- func(x, ...)
+      forms <- formals(func)
+      namesforms <- names(forms)
+      if (all(namesforms != "...")) {
+        finalargs <- c(list(x = x), args[namesargs %in% namesforms])
+      } else {
+        finalargs <- c(list(x = x), args)
+      }
+      tmp <- do.call(func, finalargs)
       names(tmp) <- paste(fnames[i], names(tmp))
       results <- c(results, tmp)
     }
