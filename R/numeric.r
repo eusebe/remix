@@ -73,6 +73,7 @@ summarize <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
 
   results <- fun(x, ...)
   class(results) <- c("summarize", "matrix")
+  attr(results, "x") <- x
   results
 }
 
@@ -99,7 +100,50 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
       colnames(results) <- funs
     }
   }
+  attr(results, "df") <- df
   results
+}
+
+# from http://gettinggeneticsdone.blogspot.com/2010/03/arrange-multiple-ggplot2-plots-in-same.html
+vp.layout <- function(x, y)
+  viewport(layout.pos.row = x, layout.pos.col = y)
+arrange <- function(..., nrow = NULL, ncol = NULL, as.table = FALSE) {
+  dots <- list(...)
+  n <- length(dots)
+  if (is.null(nrow) & is.null(ncol)) {
+    nrow <- floor(n/2)
+    ncol <- ceiling(n/nrow)
+  }
+  if (is.null(nrow)) {
+    nrow <- ceiling(n/ncol)
+  }
+  if(is.null(ncol)) {
+    ncol <- ceiling(n/nrow)
+  }
+  grid.newpage()
+  pushViewport(viewport(layout = grid.layout(nrow, ncol)))
+  ii.p <- 1
+  for(ii.row in seq(1, nrow)) {
+    ii.table.row <- ii.row 
+    if(as.table) {
+      ii.table.row <- nrow - ii.table.row + 1
+    }
+    for(ii.col in seq(1, ncol)) {
+      ii.table <- ii.p
+      if(ii.p > n) break
+      print(dots[[ii.table]], vp=vp.layout(ii.table.row, ii.col))
+      ii.p <- ii.p + 1
+    }
+  }
+}
+
+plot.summarize <- function(x, ...) {
+  require(ggplot2)
+  require(reshape)
+  mdf <- melt(attr(x, "df"))
+  box <- ggplot(mdf, aes("variable", value)) + geom_boxplot() + facet_grid(. ~ variable) + theme_bw() + opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) + xlab(NULL)
+  dens <- ggplot(mdf, aes(value, ..density..)) + geom_histogram() + geom_density() + facet_grid(. ~ variable) + theme_bw() + opts(axis.ticks = theme_blank()) + xlab(NULL)
+  arrange(box, dens, ncol = 1)
 }
 
 ##' Ascii for summarize object.
@@ -168,9 +212,10 @@ is.summarize <- function(x)
 ##' @param funs functions
 ##' @param ... passed to funs
 ##' @param useNA useNA
+##' @param addmargins addmargins
 ##' @author David Hajage
 ##' @keywords internal
-summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always")) {
+summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always"), addmargins = FALSE) {
   if (!is.numeric(x))
     stop("x doit etre numerique")  
 
@@ -195,11 +240,17 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
   })
   n.lgroup <- NULL
 
+  if (addmargins) {
+    results[[1]] <- c(results[[1]], list(summarize(x, funs = funs, ...)))
+    lgroup <- c(lgroup[[1]], "Total")
+  }
+  
   class(results) <- c("summarize.by", "list")
   attr(results, "split_type") <- NULL
   attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
   attr(results, "n.lgroup") <- n.lgroup
+  attr(results, "revert") <- FALSE
   
   results
 }
@@ -211,10 +262,11 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
 ##' @param funs fuctions
 ##' @param ... passed to funs
 ##' @param useNA useNA
+##' @param addmargins addmargins
 ##' @param revert whether to regroup factors or numeric variables when crossing factor with numeric variables
 ##' @author David Hajage
 ##' @keywords internal
-summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always"), revert = FALSE) {
+summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always"), addmargins = FALSE, revert = FALSE) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -240,12 +292,19 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
   }
   names(results) <- colnames(by)
 
+  if (addmargins) {
+    tot.results <- summarize.data.frame(df, funs = funs, ...)
+    results <- lapply(results, function(x) c(x, list(tot.results)))
+  }
+
   r <- lapply(results, function(x) {
     y <- names(x)
     y[is.na(y)] <- "NA"
+    if (addmargins)
+      y[length(y)] <- "Total"
     y
   })
-
+  
   if (!revert) {
     lgroup <- list(rep(names(df), length(unlist(r))), unlist(r), names(results))
     nr <- nrow(results[[1]][[1]])
@@ -256,15 +315,34 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
     nrr <- sapply(results, length)*ncol(by)
     n.lgroup <- list(1, nr, nrr)
   }
-  
+
   class(results) <- c("summarize.by", "list")
   attr(results, "split_type") <- NULL
   attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
   attr(results, "n.lgroup") <- n.lgroup
   attr(results, "revert") <- revert
+
+  attr(results, "df") <- df
+  attr(results, "by") <- by
   
   results
+}
+
+plot.summarize.by <- function(x, ...) {
+  require(ggplot2)
+  require(reshape)
+  df <- attr(x, "df")
+  by <- attr(x, "by")
+  box <- NULL
+  dens <- NULL
+  for (i in 1:ncol(by)) {
+    dfby <- data.frame(df, by = by[, i])
+    mdfby <- melt(dfby, id = "by")
+    box <- c(box, list(ggplot(mdfby, aes("variable", value)) + geom_boxplot(aes(fill = by)) + facet_grid(~ variable) + theme_bw() + opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) + scale_fill_discrete(names(by)[i]) + xlab(NULL)))
+    dens <- c(dens, list(ggplot(mdfby, aes(value, ..density..)) + geom_histogram(aes(fill = by), position = "dodge") + geom_density(aes(fill = by), position = "dodge") + facet_grid(. ~ variable) + theme_bw() + opts(axis.ticks = theme_blank()) + scale_fill_discrete(names(by)[i]) + xlab(NULL)))
+  }
+  do.call(arrange, c(box, dens, ncol = ncol(by)))
 }
 
 ##' Ascii for summarize.by object.
