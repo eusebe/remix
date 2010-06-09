@@ -104,46 +104,26 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   results
 }
 
-# from http://gettinggeneticsdone.blogspot.com/2010/03/arrange-multiple-ggplot2-plots-in-same.html
-vp.layout <- function(x, y)
-  viewport(layout.pos.row = x, layout.pos.col = y)
-arrange <- function(..., nrow = NULL, ncol = NULL, as.table = FALSE) {
-  dots <- list(...)
-  n <- length(dots)
-  if (is.null(nrow) & is.null(ncol)) {
-    nrow <- floor(n/2)
-    ncol <- ceiling(n/nrow)
-  }
-  if (is.null(nrow)) {
-    nrow <- ceiling(n/ncol)
-  }
-  if(is.null(ncol)) {
-    ncol <- ceiling(n/nrow)
-  }
-  grid.newpage()
-  pushViewport(viewport(layout = grid.layout(nrow, ncol)))
-  ii.p <- 1
-  for(ii.row in seq(1, nrow)) {
-    ii.table.row <- ii.row 
-    if(as.table) {
-      ii.table.row <- nrow - ii.table.row + 1
-    }
-    for(ii.col in seq(1, ncol)) {
-      ii.table <- ii.p
-      if(ii.p > n) break
-      print(dots[[ii.table]], vp=vp.layout(ii.table.row, ii.col))
-      ii.p <- ii.p + 1
-    }
-  }
-}
-
 plot.summarize <- function(x, ...) {
-  require(ggplot2)
-  require(reshape)
-  mdf <- melt(attr(x, "df"))
-  box <- ggplot(mdf, aes("variable", value)) + geom_boxplot() + facet_grid(. ~ variable) + theme_bw() + opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) + xlab(NULL)
-  dens <- ggplot(mdf, aes(value, ..density..)) + geom_histogram() + geom_density() + facet_grid(. ~ variable) + theme_bw() + opts(axis.ticks = theme_blank()) + xlab(NULL)
-  arrange(box, dens, ncol = 1)
+  mdf <- suppressMessages(melt(attr(x, "df")))
+  box <- ggplot(mdf, aes(1, value)) +
+    geom_boxplot() +
+      facet_grid(. ~ variable) +
+        theme_bw() +
+          opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) +
+            xlab(NULL)
+  dens <- ggplot(mdf, aes(value, ..density..)) +
+    geom_histogram() +
+      geom_density() +
+        facet_grid(. ~ variable) +
+          theme_bw() +
+            opts(axis.ticks = theme_blank()) +
+              xlab(NULL)
+  if (ncol(attr(x, "df")) == 1) {
+    box <- box + opts(title = names(attr(x, "df")))
+    dens <- dens + opts(title = names(attr(x, "df")))
+  }
+  suppressMessages(arrange(box, dens, ncol = 1))
 }
 
 ##' Ascii for summarize object.
@@ -330,19 +310,44 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
 }
 
 plot.summarize.by <- function(x, ...) {
-  require(ggplot2)
-  require(reshape)
   df <- attr(x, "df")
   by <- attr(x, "by")
   box <- NULL
   dens <- NULL
+  hist <- NULL
   for (i in 1:ncol(by)) {
     dfby <- data.frame(df, by = by[, i])
-    mdfby <- melt(dfby, id = "by")
-    box <- c(box, list(ggplot(mdfby, aes("variable", value)) + geom_boxplot(aes(fill = by)) + facet_grid(~ variable) + theme_bw() + opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) + scale_fill_discrete(names(by)[i]) + xlab(NULL)))
-    dens <- c(dens, list(ggplot(mdfby, aes(value, ..density..)) + geom_histogram(aes(fill = by), position = "dodge") + geom_density(aes(fill = by), position = "dodge") + facet_grid(. ~ variable) + theme_bw() + opts(axis.ticks = theme_blank()) + scale_fill_discrete(names(by)[i]) + xlab(NULL)))
+    mdfby <- suppressMessages(melt(dfby, id = "by"))
+    box <- c(box, list(ggplot(mdfby, aes("variable", value)) +
+                       geom_boxplot(aes(fill = by)) +
+                       facet_grid(~ variable) +
+                       theme_bw() +
+                       opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) +
+                       scale_fill_discrete(names(by)[i]) +
+                       xlab(NULL)))
+    dens <- c(dens, list(ggplot(mdfby, aes(value, ..density..)) +
+                         geom_density(aes(fill = by), position = "dodge", alpha = 0.5) +
+                         facet_grid(. ~ variable) +
+                         theme_bw() +
+                         opts(axis.ticks = theme_blank()) +
+                         scale_fill_discrete(names(by)[i]) +
+                         xlab(NULL)))
+    hist <- c(hist, list(ggplot(mdfby, aes(value, ..density..)) +
+                         geom_histogram(aes(fill = by), position = "dodge") +
+                         facet_grid(by ~ variable) +
+                         theme_bw() +
+                         opts(axis.ticks = theme_blank()) +
+                         scale_fill_discrete(names(by)[i]) +
+                         xlab(NULL)))
   }
-  do.call(arrange, c(box, dens, ncol = ncol(by)))
+
+  if (ncol(df) == 1) {
+    box <- lapply(box, function(x) x + opts(title = names(df)))
+    dens <- lapply(dens, function(x) x + opts(title = names(df)))
+    hist <- lapply(hist, function(x) x + opts(title = names(df)))
+  }
+  
+  suppressMessages(do.call(arrange, c(box, dens, hist, ncol = ncol(by))))
 }
 
 ##' Ascii for summarize.by object.
@@ -460,7 +465,31 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
   rownames(results) <- names(dfx)
   colnames(results) <- names(dfy)
   class(results) <- c("correlation", "matrix")
+
+  attr(results, "dfx") <- dfx
+  attr(results, "dfy") <- dfy
+  
   results
+}
+
+plot.correlation <- function(x, ...) {
+  dfx <- attr(x, "dfx")
+  dfy <- attr(x, "dfy")
+
+  xy <- unlist(lapply(dfx, function(x) lapply(dfy, function(y) cbind(x, y))), recursive = FALSE)
+  cnames <- rev(expand.grid(names(dfy), names(dfx), stringsAsFactors = FALSE))
+  xyp <- NULL
+  for (i in 1:length(xy)) {
+    df <- data.frame(xy[[i]])
+    xyp <- c(xyp, list(ggplot(df, aes(x, y)) +
+             geom_point() +
+             stat_smooth(method = lm, se = FALSE) +
+             theme_bw() +
+             xlab(cnames[i, 1]) +
+             ylab(cnames[i, 2])))
+  }
+  
+  do.call(arrange, c(xyp, nrow = ncol(dfx), ncol = ncol(dfy)))
 }
 
 ##' Ascii for correlation object.
