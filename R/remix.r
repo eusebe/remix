@@ -185,7 +185,7 @@ regroup <- function(vars, numdata) {
 ##' 
 ##' options(width = parwidth)
 ##' @keywords univar
-remix <- function(formula = cbind(...) ~ ., data, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman")) {
+remix <- function(formula = cbind(...) ~ ., data = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman")) {
   
   if (is.formula(formula))
     formula <- deparse(formula, 500)
