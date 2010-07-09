@@ -123,6 +123,7 @@ plot.summarize <- function(x, ...) {
     box <- box + opts(title = names(attr(x, "df")))
     dens <- dens + opts(title = names(attr(x, "df")))
   }
+  # plutot utiliser gridExtra ici : http://code.google.com/p/gridextra/wiki/arrange
   suppressMessages(arrange(box, dens, ncol = 1))
 }
 
@@ -214,7 +215,8 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
   results <- list(dlply(df, .(by), fun, funs = funs, ...))
 
   lgroup <- lapply(results, function(x) {
-    y <- names(x)
+    ## y <- names(x)
+    y <- as.character(attr(x, "split_labels")[, 1])
     y[is.na(y)] <- "NA"
     y
   })
@@ -278,7 +280,8 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
   }
 
   r <- lapply(results, function(x) {
-    y <- names(x)
+    ## y <- names(x)
+    y <- as.character(attr(x, "split_labels")[, 1])    
     y[is.na(y)] <- "NA"
     if (addmargins)
       y[length(y)] <- "Total"

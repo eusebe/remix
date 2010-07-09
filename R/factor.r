@@ -150,7 +150,19 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), propNA = TRU
       lev <- c(lev, "Total")
     lev})), rnames)
   class(results) <- c("freq", "matrix")
+  attr(results, "df") <- df
   results
+}
+
+plot.freq <- function(x, ...) {
+  df <- attr(x, "df")
+  mdf <- suppressMessages(melt(df, measure = names(df)))
+  bar <- ggplot(mdf, aes(value)) +
+    geom_bar(position = "dodge") +
+      facet_grid(~ variable, scale = "free_x") +
+        theme_bw() +
+          xlab(NULL)
+  print(bar)
 }
 
 ##' Ascii for freq object.
@@ -248,7 +260,7 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), prop
 ##' @param propNA propNA
 ##' @author David Hajage
 ##' @keywords internal
-tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins) {
+tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE) {
   results <- lapply(dfy, function(y) lapply(dfx, tabular, y, margin = margin, useNA = useNA, propNA = propNA, addmargins = addmargins))
   
   noms <- names(results[[1]])
@@ -281,10 +293,46 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   attr(results, "n.lgroup") <- n.lgroup
   attr(results, "tgroup") <- tgroup
   attr(results, "n.tgroup") <- n.tgroup
+
+  attr(results, "dfx") <- dfx
+  attr(results, "dfy") <- dfy
   
   class(results) <- c("tabular", "matrix")
   results
 }
+
+plot.tabular <- function(x, ...) {
+  dfx <- attr(x, "dfx")
+  dfy <- attr(x, "dfy")
+
+  mdfx <- suppressMessages(melt(dfx, measure = names(dfx)))
+  mdfy <- suppressMessages(melt(dfy, measure = names(dfy)))
+  mdf <- rbind(mdfx, mdfy)
+  dfxy <- data.frame(dfx, dfy)
+  mdfxy <- melt(dfxy, measure = names(dfy))
+  
+  bar <- ggplot(mdf, aes(value)) +
+    geom_bar(position = "dodge") +
+      facet_grid(~ variable, scale = "free_x") +
+        theme_bw() +
+          xlab(NULL)
+
+  sum <- NULL
+  for (i in 1:ncol(dfx)) {
+    sum <- c(sum, list(ggplot(mdfxy, aes(get(names(dfx)[i]), value)) +
+                       stat_sum(aes(group = 1)) +
+                       facet_grid(~ variable, scale = "free_y") +
+                       theme_bw() +
+                       xlab(names(dfx)[i]) +
+                       ylab("")))
+  }
+
+  sum <- ggplot(mdfxy, aes(get("agegp"), value)) + stat_sum(aes(group = 1)) + facet_grid(~ variable)
+}
+
+ggplot(esoph, aes(agegp, alcgp)) + stat_sum(aes(group = 1))
+ggplot(esoph, aes(agegp, alcgp, colour = agegp)) + stat_sum(aes(group = agegp))
+ggplot(esoph, aes(agegp, alcgp, colour = alcgp)) + stat_sum(aes(group = alcgp))
 
 ##' Ascii for tabular object.
 ##'
