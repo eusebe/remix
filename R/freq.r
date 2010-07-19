@@ -58,17 +58,6 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), propNA = TRU
   results
 }
 
-plot.freq <- function(x, ...) {
-  df <- attr(x, "df")
-  mdf <- suppressMessages(melt(df, measure = names(df)))
-  bar <- ggplot(mdf, aes(value)) +
-    geom_bar(position = "dodge") +
-      facet_grid(~ variable, scale = "free_x") +
-        theme_bw() +
-          xlab(NULL)
-  print(bar)
-}
-
 ##' Ascii for freq object.
 ##'
 ##' Ascii method for freq object (internal).

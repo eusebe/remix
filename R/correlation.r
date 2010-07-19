@@ -33,26 +33,6 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
   results
 }
 
-plot.correlation <- function(x, ...) {
-  dfx <- attr(x, "dfx")
-  dfy <- attr(x, "dfy")
-
-  xy <- unlist(lapply(dfx, function(x) lapply(dfy, function(y) cbind(x, y))), recursive = FALSE)
-  cnames <- rev(expand.grid(names(dfy), names(dfx), stringsAsFactors = FALSE))
-  xyp <- NULL
-  for (i in 1:length(xy)) {
-    df <- data.frame(xy[[i]])
-    xyp <- c(xyp, list(ggplot(df, aes(x, y)) +
-             geom_point() +
-             stat_smooth(method = lm, se = FALSE) +
-             theme_bw() +
-             xlab(cnames[i, 1]) +
-             ylab(cnames[i, 2])))
-  }
-  
-  do.call(arrange, c(xyp, nrow = ncol(dfx), ncol = ncol(dfy)))
-}
-
 ##' Ascii for correlation object.
 ##'
 ##' Ascii method for correlation object (internal).

@@ -52,29 +52,6 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   results
 }
 
-plot.summarize <- function(x, ...) {
-  mdf <- suppressMessages(melt(attr(x, "df")))
-  box <- ggplot(mdf, aes(1, value)) +
-    geom_boxplot() +
-      facet_grid(. ~ variable) +
-        theme_bw() +
-          opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) +
-            xlab(NULL)
-  dens <- ggplot(mdf, aes(value, ..density..)) +
-    geom_histogram() +
-      geom_density() +
-        facet_grid(. ~ variable) +
-          theme_bw() +
-            opts(axis.ticks = theme_blank()) +
-              xlab(NULL)
-  if (ncol(attr(x, "df")) == 1) {
-    box <- box + opts(title = names(attr(x, "df")))
-    dens <- dens + opts(title = names(attr(x, "df")))
-  }
-  # plutot utiliser gridExtra ici : http://code.google.com/p/gridextra/wiki/arrange
-  suppressMessages(arrange(box, dens, ncol = 1))
-}
-
 ##' Ascii for summarize object.
 ##'
 ##' Ascii method for summarize object (internal).

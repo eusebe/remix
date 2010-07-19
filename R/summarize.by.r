@@ -124,47 +124,6 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
   results
 }
 
-plot.summarize.by <- function(x, ...) {
-  df <- attr(x, "df")
-  by <- attr(x, "by")
-  box <- NULL
-  dens <- NULL
-  hist <- NULL
-  for (i in 1:ncol(by)) {
-    dfby <- data.frame(df, by = by[, i])
-    mdfby <- suppressMessages(melt(dfby, id = "by"))
-    box <- c(box, list(ggplot(mdfby, aes("variable", value)) +
-                       geom_boxplot(aes(fill = by)) +
-                       facet_grid(~ variable) +
-                       theme_bw() +
-                       opts(axis.text.x = theme_blank(), axis.ticks = theme_blank()) +
-                       scale_fill_discrete(names(by)[i]) +
-                       xlab(NULL)))
-    dens <- c(dens, list(ggplot(mdfby, aes(value, ..density..)) +
-                         geom_density(aes(fill = by), position = "dodge", alpha = 0.5) +
-                         facet_grid(. ~ variable) +
-                         theme_bw() +
-                         opts(axis.ticks = theme_blank()) +
-                         scale_fill_discrete(names(by)[i]) +
-                         xlab(NULL)))
-    hist <- c(hist, list(ggplot(mdfby, aes(value, ..density..)) +
-                         geom_histogram(aes(fill = by), position = "dodge") +
-                         facet_grid(by ~ variable) +
-                         theme_bw() +
-                         opts(axis.ticks = theme_blank()) +
-                         scale_fill_discrete(names(by)[i]) +
-                         xlab(NULL)))
-  }
-
-  if (ncol(df) == 1) {
-    box <- lapply(box, function(x) x + opts(title = names(df)))
-    dens <- lapply(dens, function(x) x + opts(title = names(df)))
-    hist <- lapply(hist, function(x) x + opts(title = names(df)))
-  }
-  
-  suppressMessages(do.call(arrange, c(box, dens, hist, ncol = ncol(by))))
-}
-
 ##' Ascii for summarize.by object.
 ##'
 ##' Ascii method for summarize.by object (internal).

@@ -71,39 +71,6 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   results
 }
 
-plot.tabular <- function(x, ...) {
-  dfx <- attr(x, "dfx")
-  dfy <- attr(x, "dfy")
-
-  mdfx <- suppressMessages(melt(dfx, measure = names(dfx)))
-  mdfy <- suppressMessages(melt(dfy, measure = names(dfy)))
-  mdf <- rbind(mdfx, mdfy)
-  dfxy <- data.frame(dfx, dfy)
-  mdfxy <- melt(dfxy, measure = names(dfy))
-  
-  bar <- ggplot(mdf, aes(value)) +
-    geom_bar(position = "dodge") +
-      facet_grid(~ variable, scale = "free_x") +
-        theme_bw() +
-          xlab(NULL)
-
-  sum <- NULL
-  for (i in 1:ncol(dfx)) {
-    sum <- c(sum, list(ggplot(mdfxy, aes(get(names(dfx)[i]), value)) +
-                       stat_sum(aes(group = 1)) +
-                       facet_grid(~ variable, scale = "free_y") +
-                       theme_bw() +
-                       xlab(names(dfx)[i]) +
-                       ylab("")))
-  }
-
-  sum <- ggplot(mdfxy, aes(get("agegp"), value)) + stat_sum(aes(group = 1)) + facet_grid(~ variable)
-}
-
-ggplot(esoph, aes(agegp, alcgp)) + stat_sum(aes(group = 1))
-ggplot(esoph, aes(agegp, alcgp, colour = agegp)) + stat_sum(aes(group = agegp))
-ggplot(esoph, aes(agegp, alcgp, colour = alcgp)) + stat_sum(aes(group = alcgp))
-
 ##' Ascii for tabular object.
 ##'
 ##' Ascii method for tabular object (internal).

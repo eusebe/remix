@@ -1,7 +1,9 @@
 # from http://gettinggeneticsdone.blogspot.com/2010/03/arrange-multiple-ggplot2-plots-in-same.html
 
+##' @keywords internal
 vp.layout <- function(x, y)
   viewport(layout.pos.row = x, layout.pos.col = y)
+##' @keywords internal
 arrange <- function(..., nrow = NULL, ncol = NULL, as.table = FALSE) {
   dots <- list(...)
   n <- length(dots)
