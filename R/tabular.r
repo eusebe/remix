@@ -43,7 +43,7 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 
   n.lgroup <- lapply(results[[1]], function(x) attr(x, "n.lgroup"))
   for (i in 1:length(n.lgroup)) {
-    n.lgroup[[i]] <- c(n.lgroup[[i]], length(lgroup[[i]][[2]])*length(unique(lgroup[[i]][[1]])))
+    n.lgroup[[i]] <- c(n.lgroup[[i]], sum(n.lgroup[[i]][[2]]))
   }
   n.lgroup1 <- unlist(lapply(n.lgroup, function(x) x[[1]]))
   n.lgroup2 <- unlist(lapply(n.lgroup, function(x) x[[2]]))
