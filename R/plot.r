@@ -152,6 +152,6 @@ plot.tabular <- function(x, ...) {
   sum <- ggplot(mdfxy, aes(get("agegp"), value)) + stat_sum(aes(group = 1)) + facet_grid(~ variable)
 }
 
-ggplot(esoph, aes(agegp, alcgp)) + stat_sum(aes(group = 1))
-ggplot(esoph, aes(agegp, alcgp, colour = agegp)) + stat_sum(aes(group = agegp))
-ggplot(esoph, aes(agegp, alcgp, colour = alcgp)) + stat_sum(aes(group = alcgp))
+## ggplot(esoph, aes(agegp, alcgp)) + stat_sum(aes(group = 1))
+## ggplot(esoph, aes(agegp, alcgp, colour = agegp)) + stat_sum(aes(group = agegp))
+## ggplot(esoph, aes(agegp, alcgp, colour = alcgp)) + stat_sum(aes(group = alcgp))

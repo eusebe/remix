@@ -1,9 +1,9 @@
-2010/xx/xx
+2010/07/20
 ----------
 
-* Version 0.x
+* Version 0.6
 * add addmargins argument
-* plot methods
+* remove unnecessary rows in tabular function
 
 2010/06/03
 ----------

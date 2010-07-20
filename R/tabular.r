@@ -1,4 +1,4 @@
-##' Compute a contingency table
+##' ##' Compute a contingency table
 ##'
 ##' @param x factor
 ##' @param y factor
@@ -11,10 +11,15 @@
 tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE) {
   n <- n.table(x, y, useNA = useNA, margin = margin, addmargins = addmargins)
   p <- p.table(x, y, useNA = useNA, propNA = propNA, margin = margin, addmargins = addmargins)
+  rn <- rownames(n)
+  rn[is.na(rn)] <- "NA"
   results <- c(n = list(n), p)
   results <- do.call(ascii:::interleave.matrix, results)
-  attr(results, "lgroup") <- list(rep(c("n", names(p)), nrow(n)), rownames(n))
-  attr(results, "n.lgroup") <- list(1, 1+length(p))
+  # remove unnecessary rows (all NA)
+  results <- results[apply(results, 1, function(x) any(!is.na(x))), ]
+  
+  attr(results, "lgroup") <- list(gsub("(^n|^cell|^row|^col)(\\.)", "\\1", gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\1", rownames(results))), rownames(n))
+  attr(results, "n.lgroup") <- list(1, table(gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\2", rownames(results)))[rn])
   attr(results, "tgroup") <- NULL
   attr(results, "n.tgroup") <- NULL
   class(results) <- c("tabular", "matrix")
