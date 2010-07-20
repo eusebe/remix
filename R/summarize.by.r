@@ -41,7 +41,7 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
   
   class(results) <- c("summarize.by", "list")
   attr(results, "split_type") <- NULL
-  attr(results, "split_labels") <- NULL
+#  attr(results, "split_labels") <- NULL
   attr(results, "lgroup") <- lgroup
   attr(results, "n.lgroup") <- n.lgroup
   attr(results, "revert") <- FALSE
@@ -86,19 +86,19 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
   }
   names(results) <- colnames(by)
 
-  if (addmargins) {
-    tot.results <- summarize.data.frame(df, funs = funs, ...)
-    results <- lapply(results, function(x) c(x, list(tot.results)))
-  }
-
   r <- lapply(results, function(x) {
     ## y <- names(x)
     y <- as.character(attr(x, "split_labels")[, 1])    
     y[is.na(y)] <- "NA"
     if (addmargins)
-      y[length(y)] <- "Total"
+      y <- c(y, "Total")
     y
   })
+
+  if (addmargins) {
+    tot.results <- summarize.data.frame(df, funs = funs, ...)
+    results <- lapply(results, function(x) c(x, list(tot.results)))
+  }
   
   if (!revert) {
     lgroup <- list(rep(names(df), length(unlist(r))), unlist(r), names(results))

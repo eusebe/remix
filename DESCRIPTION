@@ -1,7 +1,7 @@
 Package: remix
 Type: Package
 Title: Remix your data
-Version: 0.5-3
+Version: 0.6
 Date: 2010-03-26
 Author: David Hajage
 Maintainer: David Hajage <dhajage@gmail.com>
@@ -12,4 +12,6 @@ Depends: plyr, reshape, ggplot2, ascii (>= 0.6-1)
 License: GPL (>= 2)
 URL: http://eusebe.github.com/remix/, http://github.com/eusebe/remix/
 LazyLoad: yes
-Collate: 'factor.r' 'numeric.r' 'parse.r' 'rbind.r' 'remix.r'
+Collate: 'correlation.r' 'freq.r' 'funs.r' 'na.r' 'parse.r'
+    'rbind.r' 'remix.r' 'summarize.by.r' 'summarize.r'
+    'table.r' 'tabular.r'

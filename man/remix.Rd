@@ -2,9 +2,9 @@
 \alias{remix}
 \title{Remix and describe.}
 \usage{remix(formula=cbind(...) ~ ., data, funs=c(mean, sd, quantile, n, na),
-    ..., cum=FALSE, margin=0:2, useNA=c("no", "ifany", "always"),
-    propNA=TRUE, revert=FALSE, method=c("pearson", "kendall",
-    "spearman"))}
+    ..., cum=FALSE, margin=0:2, addmargins=FALSE, useNA=c("no",
+    "ifany", "always"), propNA=TRUE, revert=FALSE, method=c("pearson",
+    "kendall", "spearman"))}
 \description{Remix and describe.}
 \details{A quick and easy function for describing datasets.}
 \note{The formula has the following format: \code{x_1 + x_2 + ... ~ y_1 +
@@ -45,6 +45,7 @@ or a list.}
 \item{cum}{should cumulated frequencies be reported ?}
 \item{margin}{index, or vector of indices to generate proportion
 in frequency   tables (0: cell, 1: row, 2: col).}
+\item{addmargins}{whether to add margins}
 \item{useNA}{whether to include NA as a level (factor)}
 \item{propNA}{whether to include NA in proportion calculation}
 \item{revert}{whether to regroup factors or numeric variables when crossing factor with numeric variables}
