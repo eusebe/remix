@@ -4,6 +4,7 @@
 * Version 0.6
 * add addmargins argument
 * remove unnecessary rows in tabular function
+* set data to NULL by default, so that remix(esoph$agegp ~ .) works
 
 2010/06/03
 ----------

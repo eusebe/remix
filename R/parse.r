@@ -99,8 +99,7 @@ parse_data <- function(formula, data) {
   vars <- vars[vars != "."]
   vars <- gsub("(cbind *\\()(.*)(\\))", "\\2", vars)
   vars <- unlist(strsplit(gsub("(cbind *\\()(.*)(\\))", "\\2", vars), ","))
-  formula <- paste("~", paste(vars, collapse = "+"), sep = "")
-    
+  formula <- paste("~", paste(vars, collapse = "+"), sep = "")  
   results <- model.frame(formula, data, na.action = NULL)
   inter <- unlist(strsplit(formula, "\\~|\\+"))
   inter <- inter[grep(":", inter)]
