@@ -1,12 +1,13 @@
-##' \code{table} with addmargins
+##' \code{table} with addmargins and test
 ##'
-##' @param ... ...
+##' @param x x
+##' @param y y
 ##' @param useNA useNA
 ##' @param margin margin
 ##' @param addmargins addmargins
 ##' @author David Hajage
 ##' @keywords internal
-n.table <- function (x, y = NULL, useNA = c("no", "ifany", "always"), margin = 0:2, addmargins = FALSE) {
+n.table <- function (x, y = NULL, useNA = c("no", "ifany", "always"), margin = 0:2, addmargins = FALSE, test = FALSE, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE, na = FALSE) {
   if (is.null(y)) {
     n <- table(x, useNA = useNA)
   } else {
@@ -23,6 +24,8 @@ n.table <- function (x, y = NULL, useNA = c("no", "ifany", "always"), margin = 0
     if (length(totmargin) != 0)
       n <- addmargins(n, margin = totmargin, FUN = list(Total = sum), quiet = TRUE)
   }
+  if (test)
+    attr(n, "test") <- show.test(test.tabular(x, y, na), digits = plim, method = show.method)
   n
 }
 

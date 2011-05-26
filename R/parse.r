@@ -7,7 +7,7 @@ remove_blank <- function(formula) {
   gsub(" ", "", formula)
 }
 
-##' Separate left, right and by part of a formula
+##' Separate left and right part of a formula
 ##'
 ##' @param formula formula (character)
 ##' @author David Hajage
@@ -26,23 +26,10 @@ left_right <- function(formula) {
   right <- formula[[3]]
   if (length(right) == 1) {
     right <- deparse(right, 500)
-    by <- "."
   } else {
-    if (right[[1]] == "|") {
-      by <- right[[3]]
-      if (length(by) == 1) {
-        by <- deparse(by, 500)
-      } else {
-        by <- attr(terms(formula(paste("~", deparse(by, 500))), allowDotAsName = TRUE), "term.labels")
-        by <- by[by != "."]
-      }
-      right <- right[[2]]
-    } else {
-      by <- "."
-    }
     right <- attr(terms(formula(paste("~", deparse(right, 500))), allowDotAsName = TRUE), "term.labels")
   }
-  return(list(left = left, right = right, by = by))
+  return(list(left = left, right = right))
 }
 
 ##' Check if a variable is repeated several times in a formula

@@ -1,4 +1,4 @@
-##' ##' Compute a contingency table
+##' Compute a contingency table
 ##'
 ##' @param x factor
 ##' @param y factor
@@ -8,8 +8,8 @@
 ##' @param addmargins addmargins
 ##' @author David Hajage
 ##' @keywords internal
-tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE) {
-  n <- n.table(x, y, useNA = useNA, margin = margin, addmargins = addmargins)
+tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE, test = FALSE, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE) {
+  n <- n.table(x, y, useNA = useNA, margin = margin, addmargins = addmargins, test = test, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method, na = propNA)
   p <- p.table(x, y, useNA = useNA, propNA = propNA, margin = margin, addmargins = addmargins)
   rn <- rownames(n)
   rn[is.na(rn)] <- "NA"
@@ -22,6 +22,9 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), prop
   attr(results, "n.lgroup") <- list(1, table(gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\2", rownames(results)))[rn])
   attr(results, "tgroup") <- NULL
   attr(results, "n.tgroup") <- NULL
+  attr(results, "rgroup") <- attr(n, "test")
+  attr(results, "n.rgroup") <- nrow(results)
+  
   class(results) <- c("tabular", "matrix")
   results
 }
@@ -35,10 +38,14 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), prop
 ##' @param propNA propNA
 ##' @author David Hajage
 ##' @keywords internal
-tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE) {
-  results <- lapply(dfy, function(y) lapply(dfx, tabular, y, margin = margin, useNA = useNA, propNA = propNA, addmargins = addmargins))
-  
+tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE, test = FALSE, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE) {
+  results <- lapply(dfy, function(y) lapply(dfx, tabular, y, margin = margin, useNA = useNA, propNA = propNA, addmargins = addmargins, test = test, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method))
+
   noms <- names(results[[1]])
+
+  rgroup <- lapply(results, function(x) sapply(x, attr, "rgroup"))
+  n.rgroup <- lapply(results, function(x) sapply(x, attr, "n.rgroup"))
+  
   lgroup <- lapply(results[[1]], function(x) attr(x, "lgroup"))
 
   n.lgroup <- lapply(results[[1]], function(x) attr(x, "n.lgroup"))
@@ -62,17 +69,25 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   n.tgroup <- unlist(lapply(results, function(x) ncol(x[[1]])))
 
   results <- lapply(results, rbind.list)
-  results <- cbind.list(results)
 
-  attr(results, "lgroup") <- lgroup
-  attr(results, "n.lgroup") <- n.lgroup
-  attr(results, "tgroup") <- tgroup
-  attr(results, "n.tgroup") <- n.tgroup
+  attr(results[[1]], "lgroup") <- lgroup
+  attr(results[[1]], "n.lgroup") <- n.lgroup
 
+  if(test) {
+    for (i in 1:length(results)) {
+      attr(results[[i]], "rgroup") <- rgroup[[i]]
+      attr(results[[i]], "n.rgroup") <- n.rgroup[[i]]
+    }
+  }
+  
+  for (i in 1:length(results)) {
+    attr(results[[i]], "tgroup") <- tgroup[i]
+    attr(results[[i]], "n.tgroup") <- n.tgroup[i]
+  }
   attr(results, "dfx") <- dfx
   attr(results, "dfy") <- dfy
   
-  class(results) <- c("tabular", "matrix")
+  class(results) <- "tabular"
   results
 }
 
@@ -87,17 +102,13 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 ##' @param include.rownames see \code{?ascii} in \code{ascii} package
 ##' @param include.colnames see \code{?ascii} in \code{ascii} package
 ##' @param header see \code{?ascii} in \code{ascii} package
-##' @param lgroup see \code{?ascii} in \code{ascii} package
-##' @param n.lgroup see \code{?ascii} in \code{ascii} package
-##' @param tgroup see \code{?ascii} in \code{ascii} package
-##' @param n.tgroup see \code{?ascii} in \code{ascii} package
+##' @param rstyle see \code{?ascii} in \code{ascii} package
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
-ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), ...) {
-  class(x) <- class(x)[-1]
-
-  ascii:::ascii(x, lgroup = lgroup, n.lgroup = n.lgroup, tgroup = tgroup, n.tgroup = n.tgroup, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
+ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, rstyle = "d", ...) {
+  do.call("cbind.ascii", lapply(x, function(x) {
+    ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}))
 }
 
 ##' Print tabular object.
