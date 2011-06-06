@@ -1,3 +1,11 @@
+is.character.or.factor <- function(x) {
+  is.character(x) | is.factor(x)
+}
+
+is.numeric.and.not.surv <- function(x) {
+  is.numeric(x) & !is.Surv(x)
+}
+
 ##' Cross x and y
 ##'
 ##' @param x x
@@ -15,9 +23,12 @@
 ##' @param test.tabular test.tabular
 ##' @param test.summarize test.summarize
 ##' @param show.test show.test
+##' @param plim plim
+##' @param show.method show.method
+##' @param label display label? (using \code{Hmisc:::label})
 ##' @author David Hajage
 ##' @keywords internal
-cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman"), test = FALSE, test.tabular = test.tabular.auto, test.summarize = test.summarize.auto, show.test = display.test, plim = 4, show.method = TRUE) {
+cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman"), times = NULL, test = FALSE, test.tabular = test.tabular.auto, test.summarize = test.summarize.auto, test.survival = test.survival.logrank, show.test = display.test, plim = 4, show.method = TRUE, label = FALSE) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -26,31 +37,43 @@ cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = F
   results <- "What?"
   
   if (!is.null(x) & !is.null(y)) {
-    if (all(sapply(x, is.numeric)) & all(!sapply(y, is.numeric))) {
-      results <- summarize.data.frame.by(x, y, funs = funs, ..., addmargins = addmargins, useNA = useNA, revert = revert, test = test, test.summarize = test.summarize, show.test = show.test, plim = plim, show.method = show.method)
+    if (all(sapply(x, is.numeric.and.not.surv)) & all(sapply(y, is.character.or.factor))) {
+      results <- summarize.data.frame.by(x, y, funs = funs, ..., addmargins = addmargins, useNA = useNA, revert = revert, test = test, test.summarize = test.summarize, show.test = show.test, plim = plim, show.method = show.method, label = label)
     }
-    if (all(sapply(y, is.numeric)) & all(!sapply(x, is.numeric))) {
-      results <- summarize.data.frame.by(y, x, funs = funs, ..., addmargins = addmargins, useNA = useNA, revert = revert, test = test, test.summarize = test.summarize, show.test = show.test, plim = plim, show.method = show.method)
+    if (all(sapply(y, is.numeric.and.not.surv)) & all(sapply(x, is.character.or.factor))) {
+      results <- summarize.data.frame.by(y, x, funs = funs, ..., addmargins = addmargins, useNA = useNA, revert = revert, test = test, test.summarize = test.summarize, show.test = show.test, plim = plim, show.method = show.method, label = label)
     }
-    if (all(!sapply(x, is.numeric)) & all(!sapply(y, is.numeric))) {
-      results <- tabular.data.frame(x, y, margin = margin, addmargins = addmargins, useNA = useNA, propNA = propNA, test = test, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method)
+    if (all(sapply(x, is.Surv)) & all(sapply(y, is.character.or.factor))) {
+      results <- survival.data.frame.by(x, y, times = times, test = test, test.survival = test.survival, show.test = show.test, plim = plim, show.method = show.method, label = label)
     }
-    if (all(sapply(x, is.numeric)) & all(sapply(y, is.numeric))) {
+    if (all(sapply(y, is.Surv)) & all(sapply(x, is.character.or.factor))) {
+      results <- survival.data.frame.by(y, x, times = times, test = test, test.survival = test.survival, show.test = show.test, plim = plim, show.method = show.method, label = label)
+    }
+    if (all(sapply(x, is.character.or.factor)) & all(sapply(y, is.character.or.factor))) {
+      results <- tabular.data.frame(x, y, margin = margin, addmargins = addmargins, useNA = useNA, propNA = propNA, test = test, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method, label = label)
+    }
+    if (all(sapply(x, is.numeric.and.not.surv)) & all(sapply(y, is.numeric.and.not.surv))) {
       results <- correlation.data.frame(x, y, method = method)
     }
   } else if (is.null(y)) {
-    if (all(!sapply(x, is.numeric))) {
-      results <- freq.data.frame(x, addmargins = addmargins, useNA = useNA, propNA = propNA, cum = cum)
+    if (all(sapply(x, is.character.or.factor))) {
+      results <- freq.data.frame(x, addmargins = addmargins, useNA = useNA, propNA = propNA, cum = cum, label = label)
     }
-    if (all(sapply(x, is.numeric))) {
-      results <- summarize.data.frame(x, funs = funs, ...)
+    if (all(sapply(x, is.numeric.and.not.surv))) {
+      results <- summarize.data.frame(x, funs = funs, ..., label = label)
+    }
+    if (all(sapply(x, is.Surv))) {
+      results <- survival.data.frame(x, times = times, label = label)
     }
   } else if (is.null(x)) {
-    if (all(!sapply(y, is.numeric))) {
-      results <- freq.data.frame(y, addmargins = addmargins, useNA = useNA, propNA = propNA, cum = cum)
+    if (all(sapply(y, is.character.or.factor))) {
+      results <- freq.data.frame(y, addmargins = addmargins, useNA = useNA, propNA = propNA, cum = cum, label = label)
     } 
-    if (all(sapply(y, is.numeric))) {
-      results <- summarize.data.frame(y, funs = funs, ...)
+    if (all(sapply(y, is.numeric.and.not.surv))) {
+      results <- summarize.data.frame(y, funs = funs, ..., label = label)
+    }
+    if (all(sapply(y, is.Surv))) {
+      results <- survival.data.frame(y, times = times, label = label)
     }
   }
 
@@ -76,11 +99,12 @@ cross <- function(x, y = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = F
 ##' @param test.summarize test.summarize
 ##' @param test.tabular test.tabular
 ##' @param show.test show.test
-##' @param x x
-##' @param y y
+##' @param plim plim
+##' @param show.method show.method 
+##' @param label label
 ##' @author David Hajage
 ##' @keywords internal
-cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman"), test = FALSE, test.summarize = test.summarize.auto, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE) {
+cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman"), times = NULL, test = FALSE, test.summarize = test.summarize.auto, test.survival = test.survival.logrank, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE, label = FALSE) {
 
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
@@ -94,35 +118,29 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
     y <- NULL
   }
 
-  cross(x = x, y = y, funs = funs, ..., cum = cum, margin = margin, addmargins = addmargins, useNA = useNA, propNA = propNA, revert = revert, method = method, test = test, test.summarize = test.summarize, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method)
+  cross(x = x, y = y, funs = funs, ..., cum = cum, margin = margin, addmargins = addmargins, useNA = useNA, propNA = propNA, revert = revert, method = method, times = times, test = test, test.summarize = test.summarize, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method, label = label)
 }
 
 ##' Regroup factors with factors, and numerical variables with numerical variables
 ##'
 ##' @param vars vars
 ##' @param numdata numdata
+##' @param catdata catdata
+##' @param survdata survdata
 ##' @author David Hajage
 ##' @keywords internal
-regroup <- function(vars, numdata) {
-  vars <- lapply(strsplit(sub("(cbind\\()(.*)(\\))", "\\2", vars), ","), remove_blank)
-  results <- unlist(lapply(vars, function(x) {
-    if (!all(x %in% numdata) | !all(!(x %in% numdata))) {
-      if (length(x[x %in% numdata]) == 1)
-        xx <- x[x %in% numdata]
-      else 
-        xx <- paste("cbind(", paste(x[x %in% numdata], collapse = ","), ")", sep = "")
-      if (length(x[!(x %in% numdata)]) == 1)
-        xx <- c(xx, x[!(x %in% numdata)])
-      else 
-        xx <- c(xx, paste("cbind(", paste(x[!(x %in% numdata)], collapse = ","), ")", sep = ""))
-    } else {
-      if (length(x) == 1)
-        xx <- x
-      else
-        xx <- paste("cbind(", paste(x, collapse = ","), ")", sep = "")
-    }
+regroup <- function(vars, numdata, catdata, survdata) {
+  vars <- lapply(vars, function(x) remove_blank(elements(x)))
+
+  results <- unique(unlist(lapply(vars, function(x) {
+    xx <- c(paste("cbind(", paste(x[x %in% numdata], collapse = ","), ")", sep = ""),
+    paste("cbind(", paste(x[x %in% catdata], collapse = ","), ")", sep = ""),
+    paste("cbind(", paste(x[x %in% survdata], collapse = ","), ")", sep = ""))
     xx[xx != "cbind()"]
-  }))
+  })))
+
+  if (length(results) == 0)
+    results <- "."
   results
 }
 
@@ -136,7 +154,7 @@ regroup <- function(vars, numdata) {
 ##' \code{c(fun1, fun2, fun3)} or   \code{c("fun1", "fun2", "fun3")}
 ##' or a list.
 ##' @param ... further arguments (all passed to funs), for example
-##' \code{na.rm = TRUE}\dots.
+##'ode{na.rm = TRUE}\dots.
 ##' @param cum should cumulated frequencies be reported?
 ##' @param margin index, or vector of indices to generate proportion
 ##' in frequency tables (0: cell, 1: row, 2: col).
@@ -153,6 +171,7 @@ regroup <- function(vars, numdata) {
 ##' @param show.test function used to display the test
 ##' @param plim number of digits of the p value
 ##' @param show.method should show the test method?
+##' @param label display label? (using \code{Hmisc:::label}
 ##' @note
 ##'   The formula has the following format: \code{x_1 + x_2 + ... ~ y_1 + y_2 + ...}
 ##'
@@ -197,7 +216,7 @@ regroup <- function(vars, numdata) {
 ##' options(width = parwidth)
 ##' @keywords univar
 ##' @export
-remix <- function(formula = cbind(...) ~ ., data = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman"), test = FALSE, test.summarize = test.summarize.auto, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE) {
+remix <- function(formula = cbind(...) ~ ., data = NULL, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA = c("no", "ifany", "always"), propNA = TRUE, revert = FALSE, method = c("pearson", "kendall", "spearman"), times = NULL, test = FALSE, test.summarize = test.summarize.auto, test.survival = test.survival.logrank, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE, label = FALSE) {
   
   if (is.formula(formula))
     formula <- deparse(formula, 500)
@@ -206,7 +225,7 @@ remix <- function(formula = cbind(...) ~ ., data = NULL, funs = c(mean, sd, quan
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
   }
-  
+
   varnames <- names(data)
   parsed <- parse_formula(formula, varnames)
   
@@ -214,9 +233,12 @@ remix <- function(formula = cbind(...) ~ ., data = NULL, funs = c(mean, sd, quan
   names(data) <- remove_blank(names(data))
   varform <- names(data)
 
-  numdata <- varform[sapply(data, is.numeric)]
-  parsed$left <- regroup(parsed$left, numdata)
-  parsed$right <- regroup(parsed$right, numdata)
+  numdata <- varform[sapply(data, function(x) is.numeric(x) & !is.Surv(x))]
+  catdata <- varform[sapply(data, is.character.or.factor)]
+  survdata <- varform[sapply(data, is.Surv)]
+  
+  parsed$left <- regroup(parsed$left, numdata, catdata, survdata)
+  parsed$right <- regroup(parsed$right, numdata, catdata, survdata)
   
   eg <- expand.grid(parsed$left, parsed$right)
   
@@ -224,10 +246,11 @@ remix <- function(formula = cbind(...) ~ ., data = NULL, funs = c(mean, sd, quan
     comb <- lapply(apply(eg, 1, list), function(x) {
       y <- unlist(x)
       y <- y[y != "."]
-      y <- sub("(cbind\\()(.*)(\\))", "\\2", y)
-      lapply(y, function(z) data[, strsplit(z, ",")[[1]], drop = FALSE])})
+      ## y <- sub("(cbind\\()(.*)(\\))", "\\2", y)
+      ## lapply(y, function(z) data[, strsplit(z, ",")[[1]], drop = FALSE])})
+      lapply(y, function(z) data[, remove_blank(elements(z)), drop = FALSE])})
     
-    results <- llply(comb, cross_list, funs = funs, ..., cum = cum, margin = margin, addmargins = addmargins, useNA = useNA, propNA = propNA, revert = revert, method = method, test = test, test.summarize = test.summarize, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method)
+    results <- llply(comb, cross_list, funs = funs, ..., cum = cum, margin = margin, addmargins = addmargins, useNA = useNA, propNA = propNA, revert = revert, method = method, times = times, test = test, test.summarize = test.summarize, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method, label = label)
     names(results) <- apply(eg, 1, paste, collapse = " ~ ")
   ## }
   

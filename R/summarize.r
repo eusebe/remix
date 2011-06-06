@@ -32,7 +32,7 @@ summarize <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
 ##' @param ... passed to funs
 ##' @author David Hajage
 ##' @keywords internal
-summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
+summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), label = FALSE, ...) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -44,10 +44,14 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), ...) {
   if (length(funs) == 1) {
     if (length(match.fun(funs)(1:10, ...)) == 1) {
       dim(results) <- rev(dim(results))
-      rownames(results) <- names(dfl)
+      ## rownames(results) <- names(dfl)
       colnames(results) <- funs
     }
   }
+  if (!label)
+    rownames(results) <- names(dfl)
+  else
+    rownames(results) <- sapply(dfl, Hmisc:::label)
   attr(results, "df") <- df
   results
 }

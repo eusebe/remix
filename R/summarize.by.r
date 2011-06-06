@@ -60,7 +60,7 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
 ##' @param revert whether to regroup factors or numeric variables when crossing factor with numeric variables
 ##' @author David Hajage
 ##' @keywords internal
-summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always"), addmargins = FALSE, revert = FALSE, test = FALSE, test.summarize = test.summarize.auto, show.test = display.test, plim = 4, show.method = TRUE) {
+summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na), ..., useNA = c("no", "ifany", "always"), addmargins = FALSE, revert = FALSE, test = FALSE, test.summarize = test.summarize.auto, show.test = display.test, plim = 4, show.method = TRUE, label = FALSE) {
   if (!is.character(funs)) {
     funs <- as.character(as.list(substitute(funs)))
     funs <- funs[funs != "c" & funs != "list"]
@@ -71,6 +71,14 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
       by[, i] <- addNA(by[, i])
   }
 
+  if (!label) {
+    namescoldf <- names(df)
+    namescolby <- names(by)
+  } else {
+    namescoldf <- sapply(df, Hmisc:::label)
+    namescolby <- sapply(by, Hmisc:::label)
+  }
+  
   nby <- ncol(by)
   namesby <- paste("by", 1:nby, sep = ".")
   fun <- function(df, funs = funs, ...) summarize.data.frame(df[, 1:(ncol(df)-nby), drop = FALSE], funs = funs, ...)
@@ -101,7 +109,7 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
   }
   
   if (revert) {
-    lgroup <- list(rep(names(df), length(unlist(r))), unlist(r), names(results))
+    lgroup <- list(rep(namescoldf, length(unlist(r))), unlist(r), namescolby)
     nr <- nrow(results[[1]][[1]])
     n.lgroup <- list(1, nr, nr*sapply(r, length))
     xx <- NULL
@@ -133,7 +141,7 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
       n.rgroup <- rep(ncol(df), length(rgroup))
     }
   } else {
-    lgroup <- list(unlist(lapply(r, rep, ncol(df))), rep(names(df), ncol(by)), names(results))
+    lgroup <- list(unlist(lapply(r, rep, ncol(df))), rep(namescoldf, ncol(by)), namescolby)
     nr <- rep(sapply(results, length), each = ncol(df))
     nrr <- sapply(results, length)*ncol(df)
     n.lgroup <- list(1, nr, nrr)

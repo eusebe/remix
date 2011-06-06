@@ -35,11 +35,16 @@ freq <- function(x, useNA = c("no", "ifany", "always"), propNA = TRUE, cum = FAL
 ##' @param cum logical
 ##' @author David Hajage
 ##' @keywords internal
-freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), propNA = TRUE, cum = FALSE, addmargins = FALSE) {
+freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), propNA = TRUE, cum = FALSE, addmargins = FALSE, label = FALSE) {
   if (cum)
     addmargins <- FALSE
   dfl <- as.list(df)
-  rnames <- names(dfl)
+
+  if (!label)
+    rnames <- names(dfl)
+  else
+    rnames <- sapply(dfl, Hmisc:::label)
+  
   results <- lapply(dfl, freq, useNA = useNA, propNA = propNA, cum = cum, addmargins = addmargins)
   nrows <- sapply(results, nrow)
   results <- rbind.list(results)

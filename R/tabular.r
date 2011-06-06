@@ -38,11 +38,16 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), prop
 ##' @param propNA propNA
 ##' @author David Hajage
 ##' @keywords internal
-tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE, test = FALSE, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE) {
+tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", "always"), propNA = TRUE, addmargins = FALSE, test = FALSE, test.tabular = test.tabular.auto, show.test = display.test, plim = 4, show.method = TRUE, label = FALSE) {
   results <- lapply(dfy, function(y) lapply(dfx, tabular, y, margin = margin, useNA = useNA, propNA = propNA, addmargins = addmargins, test = test, test.tabular = test.tabular, show.test = show.test, plim = plim, show.method = show.method))
 
-  noms <- names(results[[1]])
-
+  ## noms <- names(results[[1]])
+  if (!label)
+    noms <- names(dfx)
+  else
+    noms <- sapply(dfx, Hmisc:::label)
+  
+  
   rgroup <- lapply(results, function(x) sapply(x, attr, "rgroup"))
   n.rgroup <- lapply(results, function(x) sapply(x, attr, "n.rgroup"))
   
@@ -65,7 +70,12 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   lgroup3 <- unlist(lapply(lgroup, function(x) x[[3]]))
   lgroup <- list(lgroup1, lgroup2, lgroup3)
 
-  tgroup <- names(results)
+  ## tgroup <- names(results)
+  if (!label)
+    tgroup <- names(dfy)
+  else
+    tgroup <- sapply(dfy, Hmisc:::label)
+  
   n.tgroup <- unlist(lapply(results, function(x) ncol(x[[1]])))
 
   results <- lapply(results, rbind.list)
@@ -106,9 +116,9 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
-ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, rstyle = "d", ...) {
-  do.call("cbind.ascii", lapply(x, function(x) {
-    ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}))
+ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, rstyle = "d", caption = NULL, caption.level = NULL, ...) {
+  do.call("cbind.ascii", c(lapply(x, function(x) {
+    ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}), caption = caption, caption.level = caption.level))
 }
 
 ##' Print tabular object.

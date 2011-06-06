@@ -84,14 +84,12 @@ parse_formula <- function(formula, varnames) {
 parse_data <- function(formula, data) {
   vars <- unlist(left_right(formula))
   vars <- vars[vars != "."]
-  vars <- gsub("(cbind *\\()(.*)(\\))", "\\2", vars)
-  vars <- unlist(strsplit(gsub("(cbind *\\()(.*)(\\))", "\\2", vars), ","))
-  formula <- paste("~", paste(vars, collapse = "+"), sep = "")  
-  results <- model.frame(formula, data, na.action = NULL)
-  inter <- unlist(strsplit(formula, "\\~|\\+"))
-  inter <- inter[grep(":", inter)]
+  vars <- unlist(lapply(vars, elements))
+  f <- paste("~", paste(vars, collapse = "+"), sep = "")  
+  results <- model.frame(f, data, na.action = NULL)
+  inter <- vars[grep(":", vars)]
   varinter <- strsplit(inter, ":")
-  dfinter <- as.data.frame(lapply(varinter, function(x) interaction(results[, x])))
+  dfinter <- as.data.frame(lapply(varinter, function(x) interaction(results[, remove_blank(x)])))
   names(dfinter) <- inter
   if (!all(dim(dfinter) == 0))
     results <- data.frame(results, dfinter, check.names = FALSE)
