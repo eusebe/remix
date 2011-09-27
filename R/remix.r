@@ -197,7 +197,7 @@ regroup <- function(vars, numdata, catdata, survdata) {
 ##' @param plim number of digits for the p value
 ##' @param show.method should display the test name?
 ##' @param label whether to display labels of variables (using
-##' \code{Hmisc:::label}
+##' \code{label} in package \code{Hmisc})
 ##' @note
 ##'   The formula has the following format: \code{x_1 + x_2 + ... ~ y_1 + y_2 + ...}
 ##'

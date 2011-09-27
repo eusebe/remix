@@ -81,7 +81,7 @@
   \item{show.method}{should display the test name?}
 
   \item{label}{whether to display labels of variables
-  (using \code{Hmisc:::label}}
+  (using \code{label} in package \code{Hmisc})}
 }
 \value{
   A remix object, basically a list with descriptive tables.

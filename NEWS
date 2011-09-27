@@ -12,3 +12,7 @@ NEW FEATURES
 BUG FIXES
 
 * Internal changes to take into account changes in ascii 2.0
+
+MINOR CHANGES
+
+* Drop "|" syntax (since I finally think it is useless)
