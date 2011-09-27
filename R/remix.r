@@ -132,13 +132,19 @@ cross_list <- function(l, funs = c(mean, sd, quantile, n, na), ..., cum = FALSE,
 regroup <- function(vars, numdata, catdata, survdata) {
   vars <- lapply(vars, function(x) remove_blank(elements(x)))
 
+  
   results <- unique(unlist(lapply(vars, function(x) {
-    xx <- c(paste("cbind(", paste(x[x %in% numdata], collapse = ","), ")", sep = ""),
-    paste("cbind(", paste(x[x %in% catdata], collapse = ","), ")", sep = ""),
-    paste("cbind(", paste(x[x %in% survdata], collapse = ","), ")", sep = ""))
+    numvars <- x[x %in% numdata]
+    catvars <- x[x %in% catdata]
+    survvars <- x[x %in% survdata]
+    dotvars <- x[x == "."]
+    xx <- c(if (length(numvars) > 1) paste("cbind(", paste(numvars, collapse = ","), ")", sep = "") else numvars,
+            if (length(catvars) > 1) paste("cbind(", paste(catvars, collapse = ","), ")", sep = "") else catvars,
+            if (length(survvars) > 1) paste("cbind(", paste(survvars, collapse = ","), ")", sep = "") else survvars,
+            if (length(dotvars) >= 1) ".")
     xx[xx != "cbind()"]
   })))
-
+  
   if (length(results) == 0)
     results <- "."
   results
@@ -154,7 +160,7 @@ regroup <- function(vars, numdata, catdata, survdata) {
 ##' \code{c(fun1, fun2, fun3)} or   \code{c("fun1", "fun2", "fun3")}
 ##' or a list.
 ##' @param ... further arguments (all passed to funs), for example
-##'ode{na.rm = TRUE}\dots.
+##'{na.rm = TRUE}\dots.
 ##' @param cum should cumulated frequencies be reported?
 ##' @param margin index, or vector of indices to generate proportion
 ##' in frequency tables (0: cell, 1: row, 2: col).
@@ -165,8 +171,10 @@ regroup <- function(vars, numdata, catdata, survdata) {
 ##' @param method a character string indicating which correlation
 ##' coefficient is to be   used. One of \code{"pearson"},
 ##' \code{"kendall"}, or \code{"spearman"}, can be abbreviated.
+##' @param times times vector of times (see \code{?summary.survival} un package \code{survival})
 ##' @param test should test?
 ##' @param test.summarize function used to compare means
+##' @param test.survival function used to compare survival estimations
 ##' @param test.tabular function used to test association betwean two factors
 ##' @param show.test function used to display the test
 ##' @param plim number of digits of the p value
@@ -295,6 +303,7 @@ remix <- function(formula = cbind(...) ~ ., data = NULL, funs = c(mean, sd, quan
 ##' Ascii method for remix object.
 ##'
 ##' @export
+##' @method ascii remix
 ##' @param x a remix object
 ##' @param caption.level see \code{?ascii} in \code{ascii} package
 ##' @param format see \code{?ascii} in \code{ascii} package
@@ -309,12 +318,11 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
   caption.level2 <- caption.level[2]
   caption.level3 <- caption.level[3]
   
-  xx <- ascii:::asciiMixed$new(NULL)
-  class(xx) <- c("ascii", "proto", "environment")
+  xx <- list()
   ## if (all(attr(x, "by") == ".")) {
     captions <- names(x)
     for (i in 1:length(x)) {
-      xx[[paste("obj", i, sep = "")]] <- ascii(x[[i]], caption = captions[i], caption.level = caption.level1, format = format, digits = digits, ...)
+      xx[[i]] <- ascii:::ascii(x[[i]], caption = captions[i], caption.level = caption.level1, format = format, digits = digits, ...)
     }
   ## } else if (length(attr(x, "by")) == 1) {
   ##   captions1 <- names(x)
@@ -342,7 +350,7 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
   ##     }
   ##   }
   ## }
-  xx
+  ascii:::asciiMixed$new(args = xx)
 }
 
 ##' Print a remix object
@@ -350,6 +358,8 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
 ##' Print remix object using ascii package
 ##'
 ##' @export
+##' @importFrom ascii print
+##' @method print remix
 ##' @param x a remix object
 ##' @param type type of output. See \code{?ascii} in \code{ascii} package
 ##' @param caption.level see \code{?ascii} in \code{ascii} package
@@ -360,8 +370,8 @@ ascii.remix <- function(x, caption.level = c("s", "e", "m"), format = "nice", di
 ##' @author David Hajage
 ##' @keywords univar
 print.remix <- function(x, type = "rest", caption.level = 1:3, lstyle = "", tstyle = "", ...) {
-  print(ascii(x, caption.level = caption.level, lstyle = lstyle, tstyle = tstyle, ...), type = type)
-  invisible(x)
+  print(ascii.remix(x, caption.level = caption.level, lstyle = lstyle, tstyle = tstyle, ...), type = type)
+  ## invisible(x)
 }
 
 ##' Demix

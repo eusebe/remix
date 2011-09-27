@@ -27,6 +27,7 @@ summarize <- function(x, funs = c(mean, sd, quantile, n, na), ...) {
 
 ##' Compute summary statistics (data.frame input)
 ##'
+##' @importFrom Hmisc label
 ##' @param df a data.frame
 ##' @param funs functions
 ##' @param ... passed to funs
@@ -61,6 +62,7 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), label 
 ##' Ascii method for summarize object (internal).
 ##'
 ##' @export
+##' @method ascii summarize
 ##' @param x a summarize object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -83,15 +85,18 @@ ascii.summarize <- function(x, format = "nice", digits = 5, include.rownames = T
 ##' Print summarize object (internal).
 ##'
 ##' @export
+##' @method print summarize
+##' @importFrom ascii print
 ##' @param x a summarize object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)
+##' @param lstyle see \code{?ascii} in \code{ascii} package
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords internal
 print.summarize <- function(x, type = "rest", lstyle = "", ...) {
-  print(ascii(x, lstyle = lstyle, ...), type = type)
-  invisible(x)
+  print(ascii.summarize(x, lstyle = lstyle, ...), type = type)
+  ## invisible(x)
 }
 
 ##' as.data.frame for summarize object.

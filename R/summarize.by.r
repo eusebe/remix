@@ -51,6 +51,7 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
 
 ##' Compute summary statistics according to a factor (data.frame input)
 ##'
+##' @importFrom Hmisc label
 ##' @param df data.frame
 ##' @param by data.frame
 ##' @param funs fuctions
@@ -188,6 +189,7 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
 ##' Ascii method for summarize.by object (internal).
 ##'
 ##' @export
+##' @method ascii summarize.by
 ##' @param x a summarize.by object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -211,14 +213,16 @@ ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames 
 ##' Print summarize.by object (internal).
 ##'
 ##' @export
+##' @method print summarize.by
+##' @importFrom ascii print
 ##' @param x a summarize.by object
 ##' @param type type of output (see \code{?ascii} in \code{ascii} package)
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords internal
 print.summarize.by <- function(x, type = "rest", lstyle = "", ...) {
-  print(ascii(x, lstyle = lstyle, ...), type = type)
-  invisible(x)
+  print(ascii.summarize.by(x, lstyle = lstyle, ...), type = type)
+  ## invisible(x)
 }
 
 ##' as.data.frame for summarize.by object.
@@ -231,20 +235,14 @@ print.summarize.by <- function(x, type = "rest", lstyle = "", ...) {
 ##' @author David Hajage
 ##' @keywords internal
 as.data.frame.summarize.by <- function(x, ...) {
+  xx <- unclass(x)
   if (!attr(x, "revert")) {
-    xx <- do.call(rbind, lapply(x, function(y) do.call(ascii:::interleave.matrix, y)))
     lgroup <- attr(x, "lgroup")
     n.lgroup <- attr(x, "n.lgroup")
     lgroup[[2]] <- unlist(mapply(rep, lgroup[[2]], each = n.lgroup[[2]], SIMPLIFY = FALSE))
     lgroup[[3]] <- unlist(mapply(rep, lgroup[[3]], n.lgroup[[3]], SIMPLIFY = FALSE))
     xx <- data.frame(by = lgroup[[3]], var = lgroup[[2]], levels = lgroup[[1]], xx, row.names = NULL, check.names = FALSE)
   } else {
-    xx <- NULL
-    for (i in 1:length(x)) {
-      for (j in 1:length(x[[i]])) {
-        xx <- rbind(xx, x[[i]][[j]])
-      }
-    }
     lgroup <- attr(x, "lgroup")
     n.lgroup <- attr(x, "n.lgroup")
     lgroup[[2]] <- unlist(mapply(rep, lgroup[[2]], each = n.lgroup[[2]], SIMPLIFY = FALSE))

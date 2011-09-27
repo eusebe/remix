@@ -1,5 +1,6 @@
 ##' Compute a contingency table
 ##'
+##' @importFrom Hmisc label
 ##' @param x factor
 ##' @param y factor
 ##' @param margin margin
@@ -31,6 +32,7 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), prop
 
 ##' Compute a contingency table (data.frame input)
 ##'
+##' @importFrom Hmisc label
 ##' @param dfx data.frame
 ##' @param dfy data.frame
 ##' @param margin margin
@@ -106,6 +108,7 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 ##' Ascii method for tabular object (internal).
 ##'
 ##' @export
+##' @method ascii tabular
 ##' @param x a tabular object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -113,12 +116,14 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 ##' @param include.colnames see \code{?ascii} in \code{ascii} package
 ##' @param header see \code{?ascii} in \code{ascii} package
 ##' @param rstyle see \code{?ascii} in \code{ascii} package
+##' @param caption see \code{?ascii} in \code{ascii} package
+##' @param caption.level see \code{?ascii} in \code{ascii} package
 ##' @param ... other arguments passed to \code{ascii}
 ##' @author David Hajage
 ##' @keywords univar
 ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, rstyle = "d", caption = NULL, caption.level = NULL, ...) {
-  do.call("cbind.ascii", c(lapply(x, function(x) {
-    ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}), caption = caption, caption.level = caption.level))
+  do.call(ascii:::cbind.ascii, c(lapply(x, function(x) {
+    ascii:::ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}), caption = caption, caption.level = caption.level))
 }
 
 ##' Print tabular object.
@@ -126,6 +131,8 @@ ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FAL
 ##' Print tabular object (internal).
 ##'
 ##' @export
+##' @method print tabular
+##' @importFrom ascii print
 ##' @param x a tabular object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)
@@ -136,7 +143,7 @@ ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FAL
 ##' @keywords univar
 print.tabular <- function(x, type = "rest", lstyle = "", tstyle = "", ...) {
   print(ascii:::ascii(x, lstyle = lstyle, tstyle = tstyle, ...), type = type)
-  invisible(x)
+  ## invisible(x)
 }
 
 ##' as.data.frame for tabular object.
@@ -149,12 +156,11 @@ print.tabular <- function(x, type = "rest", lstyle = "", tstyle = "", ...) {
 ##' @author David Hajage
 ##' @keywords internal
 as.data.frame.tabular <- function(x, ...) {
-  xx <- unclass(x)
-  var <- unlist(mapply(rep, attr(x, "lgroup")[[3]], attr(x, "n.lgroup")[[3]], SIMPLIFY = FALSE))
-  levels <- unlist(mapply(rep, attr(x, "lgroup")[[2]], attr(x, "n.lgroup")[[2]], SIMPLIFY = FALSE))
-  margin <- attr(x, "lgroup")[[1]]
-  
-  data.frame(var = var, levels = levels, margin = margin, xx, row.names = NULL, check.names = FALSE)
+  xx <- do.call("cbind", x)  
+  stat <- attr(x[[1]], "lgroup")[[1]]
+  levels <- unlist(mapply(rep, attr(x[[1]], "lgroup")[[2]], attr(x[[1]], "n.lgroup")[[2]], SIMPLIFY = FALSE))
+  var <- rep(attr(x[[1]], "lgroup")[[3]], attr(x[[1]], "n.lgroup")[[3]])
+  data.frame(var = var, levels = levels, stat = stat, xx, row.names = NULL, check.names = FALSE)
 }
 
 ##' Test if \code{x} is an tabular object

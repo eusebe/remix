@@ -29,6 +29,7 @@ freq <- function(x, useNA = c("no", "ifany", "always"), propNA = TRUE, cum = FAL
 
 ##' Compute frequencies (data.frame input)
 ##'
+##' @importFrom Hmisc label
 ##' @param df data.frame
 ##' @param useNA useNA
 ##' @param propNA propNA
@@ -68,6 +69,7 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), propNA = TRU
 ##' Ascii method for freq object (internal).
 ##'
 ##' @export
+##' @method ascii freq
 ##' @param x a freq object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -90,6 +92,8 @@ ascii.freq <- function(x, format = "nice", digits = 3, include.rownames = FALSE,
 ##' Print freq object (internal).
 ##'
 ##' @export
+##' @importFrom ascii print
+##' @method print freq
 ##' @param x a freq object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)
@@ -98,7 +102,7 @@ ascii.freq <- function(x, format = "nice", digits = 3, include.rownames = FALSE,
 ##' @author David Hajage
 ##' @keywords univar
 print.freq <- function(x, type = "rest", lstyle = "", ...) {
-  print(ascii(x, lstyle = lstyle, ...), type = type)
+  print(ascii.freq(x, lstyle = lstyle, ...), type = type)
   invisible(x)
 }
 
