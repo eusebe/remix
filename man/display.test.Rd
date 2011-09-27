@@ -1,0 +1,23 @@
+\name{display.test}
+\alias{display.test}
+\title{Display a test result}
+\usage{
+  display.test(test, digits = 4, method = TRUE)
+}
+\arguments{
+  \item{test}{test}
+
+  \item{digits}{number of digits}
+
+  \item{method}{display method}
+}
+\value{
+  a character string
+}
+\description{
+  Display a test result
+}
+\author{
+  David Hajage
+}
+

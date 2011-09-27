@@ -5,13 +5,34 @@ Title: Remix your data
 Type: Package
 LazyLoad: yes
 Author: David Hajage
-Description: remix provides remix, a quick and easy function for
-    describing datasets. It can be view as a mix of cast (in package
-    reshape) and summary.formula (in package Hmisc).
-Version: 1.0
-URL: http://eusebe.github.com/remix/, http://github.com/eusebe/remix/
+Description: remix provides remix, a quick and easy
+    function for describing datasets. It can be view as a
+    mix of cast (in package reshape) and summary.formula
+    (in package Hmisc).
+Version: 2.0
+URL: http://eusebe.github.com/remix/,
+    http://github.com/eusebe/remix/
 Date: 2010-03-26
-Depends: plyr, ascii (>= 0.6-1)
-Collate: 'correlation.r' 'freq.r' 'funs.r' 'na.r' 'parse.r'
-    'rbind.r' 'remix.r' 'summarize.by.r' 'summarize.r'
-    'table.r' 'tabular.r' 'test.r'
+Depends:
+    plyr,
+    survival,
+    ascii,
+    Hmisc
+Imports:
+    Hmisc,
+    ascii
+Collate:
+    'correlation.r'
+    'element.r'
+    'freq.r'
+    'funs.r'
+    'na.r'
+    'parse.r'
+    'rbind.r'
+    'remix.r'
+    'summarize.by.r'
+    'summarize.r'
+    'survival.r'
+    'table.r'
+    'tabular.r'
+    'test.r'

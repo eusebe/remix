@@ -1,8 +1,4 @@
 .git
 .git/*
-load.r
-R/plot.r
 R/layout.r
-man/plot.*
-man/vp.layout.*
-man/arrange.*
+R/plot.r
