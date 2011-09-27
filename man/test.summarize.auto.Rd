@@ -10,7 +10,7 @@
   \item{g}{another vector}
 }
 \value{
-  a list with two componments: p and method
+  a list with two componments: p.value and method
 }
 \description{
   Compute a oneway.test (with equal or unequal variance) or

@@ -22,7 +22,7 @@
   "fun2", "fun3")} or a list.}
 
   \item{...}{further arguments (all passed to funs), for
-  example {na.rm = TRUE}\dots.}
+  example {na.rm = TRUE}}
 
   \item{cum}{should cumulated frequencies be reported?}
 
@@ -48,23 +48,40 @@
   \item{times}{times vector of times (see
   \code{?summary.survival} un package \code{survival})}
 
-  \item{test}{should test?}
+  \item{test}{whether to perform tests}
 
-  \item{test.summarize}{function used to compare means}
+  \item{test.summarize}{a function of two arguments
+  (continuous variable and grouping variable) used to
+  compare continuous variable, that return a list of two
+  components : \code{p.value} and \code{method} (the test
+  name). See \code{test.summarize.auto},
+  \code{test.summarize.kruskal},
+  \code{test.summarize.oneway.equalvar}, or
+  \code{test.summarize.unequalvar} for example of such
+  functions. Users can provide their own function.}
 
-  \item{test.survival}{function used to compare survival
-  estimations}
+  \item{test.survival}{a function of one argument (a
+  formula) used to compare survival estimations, that
+  returns the same components as created by
+  \code{test.summarize}. See \code{test.survival.logrank}.
+  Users can provide their own function.}
 
-  \item{test.tabular}{function used to test association
-  betwean two factors}
+  \item{test.tabular}{a function of three arguments (two
+  categorical variables and a logical \code{na}) used to
+  test association between two factors, that returns the
+  same components as created by \code{test.summarize}. See
+  \code{test.tabular.auto} and \code{test.tabular.fisher}.
+  Users can provide their own function.}
 
-  \item{show.test}{function used to display the test}
+  \item{show.test}{a function used to display the test
+  result. See \code{display.test}.}
 
-  \item{plim}{number of digits of the p value}
+  \item{plim}{number of digits for the p value}
 
-  \item{show.method}{should show the test method?}
+  \item{show.method}{should display the test name?}
 
-  \item{label}{display label? (using \code{Hmisc:::label}}
+  \item{label}{whether to display labels of variables
+  (using \code{Hmisc:::label}}
 }
 \value{
   A remix object, basically a list with descriptive tables.
@@ -86,13 +103,18 @@
   If \code{var1} is numeric, \code{var1 ~ .} produce a
   summary table using \code{funs}. If \code{var1} is a
   factor, \code{var1 ~ .} produce a frequency table. If
-  \code{var1} is numeric and \code{var2} is numeric,
-  \code{var1 ~ var2} gives correlation. if \code{var1} is
-  numeric and \code{var2} is a factor, \code{var1 ~ var2}
-  produce a summary table using \code{funs} according to
-  the levels of \code{var2}. If \code{var1} is a factor and
-  \code{var2} is a factor, \code{var1 ~ var2} produce a
-  contingency table.
+  \code{var1} is of class \code{Surv}, \code{var1 ~ .}
+  produce a table with the estimates of survival at
+  \code{times}. If \code{var1} is numeric and \code{var2}
+  is numeric, \code{var1 ~ var2} gives correlation. if
+  \code{var1} is numeric and \code{var2} is a factor,
+  \code{var1 ~ var2} produce a summary table using
+  \code{funs} according to the levels of \code{var2}. If
+  \code{var1} is a factor and \code{var2} is a factor,
+  \code{var1 ~ var2} produce a contingency table. If
+  \code{var1} is of class \code{Surv} and \code{var2} is a
+  factor, \code{var1 ~ var2} produce a table with the
+  estimates of survival for each level of \code{var2}.
 
   You can group several variables of the same type (numeric
   or factor) together with \code{cbind(var1, var2, var3)},
@@ -111,6 +133,7 @@ remix(Sepal.Length + Sepal.Width ~ Petal.Length + Petal.Width, iris)
 remix(cbind(Sepal.Length, Sepal.Width) ~ cbind(Petal.Length, Petal.Width), iris)
 remix(... ~ ., esoph, cum = TRUE)
 remix(alcgp ~ tobgp, esoph, cum = TRUE)
+remix(Surv(time, status) ~ x, data = aml, times = seq(0, 120, 12))
 
 options(width = parwidth)
 }

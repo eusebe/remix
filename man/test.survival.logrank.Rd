@@ -8,7 +8,7 @@
   \item{formula}{a formula}
 }
 \value{
-  a list with two componments: p and method
+  a list with two componments: p.value and method
 }
 \description{
   Compute a logrank test

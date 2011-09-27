@@ -12,7 +12,7 @@
   \item{na}{use NA ?}
 }
 \value{
-  a list with two componments: p and method
+  a list with two componments: p.value and method
 }
 \description{
   Compute a fisher test
