@@ -52,7 +52,7 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), label 
   if (!label)
     rownames(results) <- names(dfl)
   else
-    rownames(results) <- sapply(dfl, Hmisc:::label)
+    rownames(results) <- sapply(dfl, Hmisc:::label.default)
   attr(results, "df") <- df
   results
 }

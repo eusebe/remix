@@ -47,7 +47,7 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   if (!label)
     noms <- names(dfx)
   else
-    noms <- sapply(dfx, Hmisc:::label)
+    noms <- sapply(dfx, Hmisc:::label.default)
   
   
   rgroup <- lapply(results, function(x) sapply(x, attr, "rgroup"))
@@ -76,7 +76,7 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
   if (!label)
     tgroup <- names(dfy)
   else
-    tgroup <- sapply(dfy, Hmisc:::label)
+    tgroup <- sapply(dfy, Hmisc:::label.default)
   
   n.tgroup <- unlist(lapply(results, function(x) ncol(x[[1]])))
 

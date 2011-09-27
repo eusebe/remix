@@ -44,7 +44,7 @@ freq.data.frame <- function(df, useNA = c("no", "ifany", "always"), propNA = TRU
   if (!label)
     rnames <- names(dfl)
   else
-    rnames <- sapply(dfl, Hmisc:::label)
+    rnames <- sapply(dfl, Hmisc:::label.default)
   
   results <- lapply(dfl, freq, useNA = useNA, propNA = propNA, cum = cum, addmargins = addmargins)
   nrows <- sapply(results, nrow)

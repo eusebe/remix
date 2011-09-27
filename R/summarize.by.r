@@ -76,8 +76,8 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
     namescoldf <- names(df)
     namescolby <- names(by)
   } else {
-    namescoldf <- sapply(df, Hmisc:::label)
-    namescolby <- sapply(by, Hmisc:::label)
+    namescoldf <- sapply(df, Hmisc:::label.default)
+    namescolby <- sapply(by, Hmisc:::label.default)
   }
   
   nby <- ncol(by)

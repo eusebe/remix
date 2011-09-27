@@ -27,7 +27,7 @@ display.test <- function(test, digits = 4, method = TRUE) {
 ##' @param y another vector
 ##' @param na use NA ?
 ##' @author David Hajage
-##' @return a list with two componments: p and method
+##' @return a list with two componments: p.value and method
 ##' @export
 test.tabular.auto <- function(x, y, na = FALSE) {
   if (na) {
@@ -57,7 +57,7 @@ test.tabular.auto <- function(x, y, na = FALSE) {
 ##' @param x vector
 ##' @param y another vector
 ##' @param na use NA ?
-##' @return a list with two componments: p and method
+##' @return a list with two componments: p.value and method
 ##' @author David Hajage
 ##' @export
 test.tabular.fisher <- function(x, y, na = FALSE) {
@@ -79,7 +79,7 @@ test.tabular.fisher <- function(x, y, na = FALSE) {
 ##' 
 ##' @param x vector
 ##' @param g another vector
-##' @return a list with two componments: p and method
+##' @return a list with two componments: p.value and method
 ##' @author David Hajage
 ##' @export
 test.summarize.auto <- function(x, g) {
@@ -115,7 +115,7 @@ test.summarize.auto <- function(x, g) {
 ##' 
 ##' @param x vector
 ##' @param g another vector
-##' @return a list with two componments: p and method
+##' @return a list with two componments: p.value and method
 ##' @author David Hajage
 ##' @export
 test.summarize.kruskal <- function(x, g) {
@@ -137,7 +137,7 @@ test.summarize.kruskal <- function(x, g) {
 ##' 
 ##' @param x vector
 ##' @param g another vector
-##' @return a list with two componments: p and method
+##' @return a list with two componments: p.value and method
 ##' @author David Hajage
 ##' @export
 test.summarize.oneway.equalvar <- function(x, g) {
@@ -159,7 +159,7 @@ test.summarize.oneway.equalvar <- function(x, g) {
 ##' 
 ##' @param x vector
 ##' @param g another vector
-##' @return a list with two componments: p and method
+##' @return a list with two componments: p.value and method
 ##' @author David Hajage
 ##' @export
 test.summarize.oneway.unequalvar <- function(x, g) {
@@ -181,7 +181,7 @@ test.summarize.oneway.unequalvar <- function(x, g) {
 ##' Compute a logrank test
 ##' 
 ##' @param formula a formula
-##' @return a list with two componments: p and method
+##' @return a list with two componments: p.value and method
 ##' @author David Hajage
 ##' @export
 test.survival.logrank <- function(formula) {

@@ -88,7 +88,7 @@ survival.data.frame.by <- function(df, by, times = NULL, test = FALSE, test.surv
   if (!label)
     tgroup <- names(by)
   else
-    tgroup <- sapply(by, Hmisc:::label)
+    tgroup <- sapply(by, Hmisc:::label.default)
   n.tgroup <- sapply(by, nlevels)
 
   lgroup <- lapply(results[[1]], function(x) attr(x, "lgroup"))
@@ -105,7 +105,7 @@ survival.data.frame.by <- function(df, by, times = NULL, test = FALSE, test.surv
   if (!label)
     lgroup2 <- names(df)
   else
-    lgroup2 <- sapply(df, Hmisc:::label)
+    lgroup2 <- sapply(df, Hmisc:::label.default)
   lgroup <- list(lgroup1, lgroup2)
     
   rgroup <- lapply(results, function(x) sapply(x, attr, "rgroup"))

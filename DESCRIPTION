@@ -16,11 +16,9 @@ Date: 2010-03-26
 Depends:
     plyr,
     survival,
-    ascii,
-    Hmisc
-Imports:
-    Hmisc,
     ascii
+Imports:
+    Hmisc
 Collate:
     'correlation.r'
     'element.r'
