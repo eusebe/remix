@@ -1,5 +1,6 @@
 ##' Display a test result
 ##'
+##' @import ascii 
 ##' @param test test
 ##' @param digits number of digits
 ##' @param method display method
@@ -10,7 +11,7 @@ display.test <- function(test, digits = 4, method = TRUE) {
   if (all(sapply(test, is.null)))
     "No test"
   else {
-    p <- ascii:::plim(test$p.value, digits = digits)
+    p <- plim(test$p.value, digits = digits)
     if (method)
     paste("p value: ", p, " (", test$method, ")", sep = "")
   else

@@ -52,6 +52,7 @@ summarize.by <- function(x, by, funs = c(mean, sd, quantile, n, na), ..., useNA 
 ##' Compute summary statistics according to a factor (data.frame input)
 ##'
 ##' @importFrom Hmisc label
+##' @import ascii
 ##' @param df data.frame
 ##' @param by data.frame
 ##' @param funs fuctions
@@ -146,7 +147,7 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
     nr <- rep(sapply(results, length), each = ncol(df))
     nrr <- sapply(results, length)*ncol(df)
     n.lgroup <- list(1, nr, nrr)
-    results <- do.call(rbind, lapply(results, function(x) do.call(ascii:::interleave.matrix, x)))
+    results <- do.call(rbind, lapply(results, function(x) do.call(interleave.matrix, x)))
 
     rgroup <- NULL
     n.rgroup <- NULL
@@ -190,6 +191,7 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
 ##'
 ##' @export
 ##' @method ascii summarize.by
+##' @import ascii
 ##' @param x a summarize.by object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -205,7 +207,7 @@ summarize.data.frame.by <- function(df, by, funs = c(mean, sd, quantile, n, na),
 ##' @author David Hajage
 ##' @keywords univar
 ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = "d", ...) {
-  ascii:::ascii.default(unclass(x), lgroup = lgroup, n.lgroup = n.lgroup, rgroup = rgroup, n.rgroup = n.rgroup, rstyle = rstyle, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
+  ascii(unclass(x), lgroup = lgroup, n.lgroup = n.lgroup, rgroup = rgroup, n.rgroup = n.rgroup, rstyle = rstyle, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
 ##' Print summarize.by object.
@@ -214,7 +216,7 @@ ascii.summarize.by <- function(x, format = "nice", digits = 5, include.rownames 
 ##'
 ##' @export
 ##' @method print summarize.by
-##' @importFrom ascii print
+##' @import ascii
 ##' @param x a summarize.by object
 ##' @param type type of output (see \code{?ascii} in \code{ascii} package)
 ##' @param ... other arguments passed to \code{ascii}

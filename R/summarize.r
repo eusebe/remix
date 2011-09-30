@@ -63,6 +63,7 @@ summarize.data.frame <- function(df, funs = c(mean, sd, quantile, n, na), label 
 ##'
 ##' @export
 ##' @method ascii summarize
+##' @import ascii
 ##' @param x a summarize object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -77,7 +78,7 @@ ascii.summarize <- function(x, format = "nice", digits = 5, include.rownames = T
     x <- t(x)
   }
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
+  ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
 ##' Print summarize object.
@@ -86,7 +87,7 @@ ascii.summarize <- function(x, format = "nice", digits = 5, include.rownames = T
 ##'
 ##' @export
 ##' @method print summarize
-##' @importFrom ascii print
+##' @import ascii 
 ##' @param x a summarize object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)

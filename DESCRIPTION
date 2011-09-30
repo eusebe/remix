@@ -15,10 +15,10 @@ URL: http://eusebe.github.com/remix/,
 Date: 2010-03-26
 Depends:
     plyr,
-    survival,
-    ascii
+    survival
 Imports:
-    Hmisc
+    Hmisc,
+    ascii
 Collate:
     'correlation.r'
     'element.r'

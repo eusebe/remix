@@ -1,6 +1,7 @@
 ##' Compute a contingency table
 ##'
 ##' @importFrom Hmisc label
+##' @import ascii
 ##' @param x factor
 ##' @param y factor
 ##' @param margin margin
@@ -15,10 +16,10 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), prop
   rn <- rownames(n)
   rn[is.na(rn)] <- "NA"
   results <- c(n = list(n), p)
-  results <- do.call(ascii:::interleave.matrix, results)
+  results <- do.call(interleave.matrix, results)
   # remove unnecessary rows (all NA)
   results <- results[apply(results, 1, function(x) any(!is.na(x))), ]
-  
+
   attr(results, "lgroup") <- list(gsub("(^n|^cell|^row|^col)(\\.)", "\\1", gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\1", rownames(results))), rownames(n))
   attr(results, "n.lgroup") <- list(1, table(gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\2", rownames(results)))[rn])
   attr(results, "tgroup") <- NULL
@@ -109,6 +110,7 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 ##'
 ##' @export
 ##' @method ascii tabular
+##' @import ascii 
 ##' @param x a tabular object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -122,8 +124,8 @@ tabular.data.frame <- function(dfx, dfy, margin = 0:2, useNA = c("no", "ifany", 
 ##' @author David Hajage
 ##' @keywords univar
 ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, rstyle = "d", caption = NULL, caption.level = NULL, ...) {
-  do.call(ascii:::cbind.ascii, c(lapply(x, function(x) {
-    ascii:::ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}), caption = caption, caption.level = caption.level))
+  do.call(cbind.ascii, c(lapply(x, function(x) {
+    ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}), caption = caption, caption.level = caption.level))
 }
 
 ##' Print tabular object.
@@ -132,7 +134,7 @@ ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FAL
 ##'
 ##' @export
 ##' @method print tabular
-##' @importFrom ascii print
+##' @import ascii
 ##' @param x a tabular object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)
@@ -142,7 +144,7 @@ ascii.tabular <- function(x, format = "nice", digits = 5, include.rownames = FAL
 ##' @author David Hajage
 ##' @keywords univar
 print.tabular <- function(x, type = "rest", lstyle = "", tstyle = "", ...) {
-  print(ascii:::ascii(x, lstyle = lstyle, tstyle = tstyle, ...), type = type)
+  print(ascii.tabular(x, lstyle = lstyle, tstyle = tstyle, ...), type = type)
   ## invisible(x)
 }
 

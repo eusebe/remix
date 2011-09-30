@@ -6,11 +6,12 @@
   c(mean, sd, quantile, n, na), ..., cum = FALSE, margin =
   0:2, addmargins = FALSE, useNA = c("no", "ifany",
   "always"), propNA = TRUE, revert = FALSE, method =
-  c("pearson", "kendall", "spearman"), times = NULL, test =
-  FALSE, test.summarize = test.summarize.auto,
-  test.survival = test.survival.logrank, test.tabular =
-  test.tabular.auto, show.test = display.test, plim = 4,
-  show.method = TRUE, label = FALSE)
+  c("pearson", "kendall", "spearman"), times = NULL,
+  followup = FALSE, test = FALSE, test.summarize =
+  test.summarize.auto, test.survival =
+  test.survival.logrank, test.tabular = test.tabular.auto,
+  show.test = display.test, plim = 4, show.method = TRUE,
+  label = FALSE)
 }
 \arguments{
   \item{formula}{a formula (see Details).}
@@ -45,8 +46,10 @@
   \code{"pearson"}, \code{"kendall"}, or \code{"spearman"},
   can be abbreviated.}
 
-  \item{times}{times vector of times (see
+  \item{times}{vector of times (see
   \code{?summary.survival} un package \code{survival})}
+
+  \item{followup}{whether to display follow-up time}
 
   \item{test}{whether to perform tests}
 

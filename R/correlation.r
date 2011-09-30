@@ -39,6 +39,7 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
 ##'
 ##' @export
 ##' @method ascii correlation
+##' @import ascii
 ##' @param x a correlation object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -50,7 +51,7 @@ correlation.data.frame <- function(dfx, dfy, method = c("pearson", "kendall", "s
 ##' @keywords internal
 ascii.correlation <- function(x, format = "nice", digits = 5, include.rownames = TRUE, include.colnames = TRUE, header = TRUE, ...) {
   class(x) <- class(x)[-1]
-  ascii:::ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
+  ascii(x, include.rownames = include.rownames, include.colnames = include.colnames, header = header, format = format, digits = digits, ...)
 }
 
 ##' Print correlation object.
@@ -59,7 +60,7 @@ ascii.correlation <- function(x, format = "nice", digits = 5, include.rownames =
 ##'
 ##' @export
 ##' @method print correlation
-##' @importFrom ascii print
+##' @import ascii
 ##' @param x a correlation object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)

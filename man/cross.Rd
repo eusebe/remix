@@ -6,11 +6,11 @@
   ..., cum = FALSE, margin = 0:2, addmargins = FALSE, useNA
   = c("no", "ifany", "always"), propNA = TRUE, revert =
   FALSE, method = c("pearson", "kendall", "spearman"),
-  times = NULL, test = FALSE, test.tabular =
-  test.tabular.auto, test.summarize = test.summarize.auto,
-  test.survival = test.survival.logrank, show.test =
-  display.test, plim = 4, show.method = TRUE, label =
-  FALSE)
+  times = NULL, followup = FALSE, test = FALSE,
+  test.tabular = test.tabular.auto, test.summarize =
+  test.summarize.auto, test.survival =
+  test.survival.logrank, show.test = display.test, plim =
+  4, show.method = TRUE, label = FALSE)
 }
 \arguments{
   \item{x}{x}
@@ -36,11 +36,17 @@
 
   \item{method}{method}
 
+  \item{times}{times}
+
+  \item{followup}{followup}
+
   \item{test}{test}
 
   \item{test.tabular}{test.tabular}
 
   \item{test.summarize}{test.summarize}
+
+  \item{test.survival}{}
 
   \item{show.test}{show.test}
 

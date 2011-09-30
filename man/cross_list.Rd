@@ -6,8 +6,8 @@
   cum = FALSE, margin = 0:2, addmargins = FALSE, useNA =
   c("no", "ifany", "always"), propNA = TRUE, revert =
   FALSE, method = c("pearson", "kendall", "spearman"),
-  times = NULL, test = FALSE, test.summarize =
-  test.summarize.auto, test.survival =
+  times = NULL, followup = FALSE, test = FALSE,
+  test.summarize = test.summarize.auto, test.survival =
   test.survival.logrank, test.tabular = test.tabular.auto,
   show.test = display.test, plim = 4, show.method = TRUE,
   label = FALSE)
@@ -34,9 +34,15 @@
 
   \item{method}{method}
 
+  \item{times}{times}
+
+  \item{followup}{followup}
+
   \item{test}{test}
 
   \item{test.summarize}{test.summarize}
+
+  \item{test.survival}{}
 
   \item{test.tabular}{test.tabular}
 

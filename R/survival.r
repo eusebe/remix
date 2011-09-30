@@ -1,8 +1,10 @@
 ##' Compute survival
 ##'
+##' @import ascii
 ##' @param surv a Surv object
 ##' @param by by
 ##' @param times times 
+##' @param followup followup
 ##' @param test test
 ##' @param test.survival test.survival
 ##' @param show.test show.test
@@ -10,17 +12,24 @@
 ##' @param show.method show.method
 ##' @author David Hajage
 ##' @keywords internal
-survival <- function(surv, by = NULL, times = NULL, test = FALSE, test.survival = test.survival.logrank, show.test = display.test, plim = 4, show.method = TRUE) {
+survival <- function(surv, by = NULL, times = NULL, followup = FALSE, test = FALSE, test.survival = test.survival.logrank, show.test = display.test, plim = 4, show.method = TRUE) {
 
   df <- unclass(surv)
-  if (!is.null(by))
+  if (!is.null(by)) {
     formula <- as.formula(paste("Surv(df[, 1], df[, 2]) ~ by", sep = ""))
-  else
+    formula.followup <- as.formula(paste("Surv(df[, 1], 1-df[, 2]) ~ by", sep = ""))
+  }
+  else {
     formula <- as.formula(paste("Surv(df[, 1], df[, 2]) ~ 1", sep = ""))
-  formula.followup <- as.formula(paste("Surv(df[, 1], 1-df[, 2]) ~ 1", sep = ""))
-  suivfit.obj <- survfit(formula.followup)
+    formula.followup <- as.formula(paste("Surv(df[, 1], 1-df[, 2]) ~ 1", sep = ""))
+  }
   
   survfit.obj <- survfit(formula)
+
+  if (followup) {
+    suivfit.obj <- survfit(formula.followup)
+  }
+
   if (is.null(times)) {
     times <- sort(survfit.obj$time)
     x <- summary(survfit.obj, times = times, extend = TRUE)
@@ -29,32 +38,48 @@ survival <- function(surv, by = NULL, times = NULL, test = FALSE, test.survival 
   }
   
   mat <- cbind(x$surv, x$n.event, x$n.risk)
-  mat <- ascii:::paste.matrix(round(mat[, 1], 4), " (", mat[, 2], "/", mat[, 3], ")", sep = "")
+  mat <- paste.matrix(round(mat[, 1], 4), " (", mat[, 2], "/", mat[, 3], ")", sep = "")
   if (!is.null(x$strata)) {
     strata <- x$strata
-    results <- ascii:::tocharac(do.call("cbind", split(as.data.frame(mat), strata)))
+    results <- tocharac(do.call("cbind", split(as.data.frame(mat), strata)))
     nstrata <- length(unique(strata))
-    suiv <- NULL
+
+    if (followup) {
+      mediansuiv <- summary(suivfit.obj)$table[, 5]
+      tmp <- data.frame(unclass(model.frame(formula)[, 1]), model.frame(formula)[, 2])
+      bornes <- daply(tmp, .(tmp[, 3]), function(df) paste("[", min(df[df[, 2] == 0, 1]), " ; ", max(df[, 1]), "]", sep = ""))
+      suiv <- paste(mediansuiv, bornes)
+    } else {
+      suiv <- NULL
+    }
     if (test) {
       p <- show.test(test.survival(formula), digits = plim, method = show.method)
     } else {
       p <- NULL
     }
-    rnames <- c("Median survival", times)
     cnames <- names(table(by))
   } else {
     results <- mat
     nstrata <- 1
-    mediansuiv <- summary(suivfit.obj)$table[5]
-    tmp <- unclass(model.frame(formula)[, 1])
-    minsuiv <- min(tmp[tmp[, 2] == 0, 1])
-    maxsuiv <- max(tmp[, 1])
-    suiv <- paste(mediansuiv, " [", minsuiv, " ; ", maxsuiv, "]", sep = "")
+    if (followup) {
+      mediansuiv <- summary(suivfit.obj)$table[5]
+      tmp <- unclass(model.frame(formula)[, 1])
+      minsuiv <- min(tmp[tmp[, 2] == 0, 1])
+      maxsuiv <- max(tmp[, 1])
+      suiv <- paste(mediansuiv, " [", minsuiv, " ; ", maxsuiv, "]", sep = "")
+    } else {
+      suiv <- NULL
+    }
     p <- NULL
-    rnames <- c("Median follow up [min ; max]", "Median survival", times)
     cnames <- NULL
   }
-  mediansurv <- ascii:::expand(x$table, nrow = nstrata, ncol = 7, drop = F)[, 5]
+
+  if (followup) {
+    rnames <- c("Median follow up [min ; max]", "Median survival", times)
+  } else {
+    rnames <- c("Median survival", times)    
+  }
+  mediansurv <- expand(x$table, nrow = nstrata, ncol = 7, drop = F)[, 5]
 
   results <- rbind(suiv, mediansurv, results)
   colnames(results) <- cnames
@@ -71,6 +96,7 @@ survival <- function(surv, by = NULL, times = NULL, test = FALSE, test.survival 
 ##' @param df df
 ##' @param by by
 ##' @param times times
+##' @param followup followup
 ##' @param test test
 ##' @param test.survival test.survival
 ##' @param show.test show.test
@@ -78,12 +104,12 @@ survival <- function(surv, by = NULL, times = NULL, test = FALSE, test.survival 
 ##' @param show.method show.method
 ##' @param label label
 ##' @author David Hajage
-survival.data.frame.by <- function(df, by, times = NULL, test = FALSE, test.survival = test.survival.logrank, show.test = display.test, plim = 4, show.method = TRUE, label = FALSE) {
+survival.data.frame.by <- function(df, by, times = NULL, followup = FALSE, test = FALSE, test.survival = test.survival.logrank, show.test = display.test, plim = 4, show.method = TRUE, label = FALSE) {
 
   dfx <- as.list(df)
   byx <- as.list(by)
   
-  results <- lapply(byx, function(y) lapply(dfx, survival, y, times = times, test = test, test.survival = test.survival, show.test = show.test, plim = plim, show.method = show.method))
+  results <- lapply(byx, function(y) lapply(dfx, survival, y, times = times, followup = followup, test = test, test.survival = test.survival, show.test = show.test, plim = plim, show.method = show.method))
 
   if (!label)
     tgroup <- names(by)
@@ -131,15 +157,16 @@ survival.data.frame.by <- function(df, by, times = NULL, test = FALSE, test.surv
   results
 }
 
-##' Compute survival according to a factor
+##' Compute survival (data.frame input)
 ##'
 ##' @param df df
 ##' @param times times
+##' @param followup followup
 ##' @param label label
 ##' @author David Hajage
-survival.data.frame <- function(df, times = NULL, label = FALSE) {
+survival.data.frame <- function(df, times = NULL, followup = FALSE, label = FALSE) {
 
-  results <- lapply(df, survival, NULL, times = times)
+  results <- lapply(df, survival, NULL, times = times, followup = followup)
 
   lgroup <- lapply(results, function(x) attr(x, "lgroup"))
   n.lgroup <- lapply(results, function(x) attr(x, "n.lgroup"))
@@ -169,6 +196,7 @@ survival.data.frame <- function(df, times = NULL, label = FALSE) {
 ##'
 ##' @export
 ##' @method ascii survival
+##' @import ascii 
 ##' @param x a survival object
 ##' @param format see \code{?ascii} in \code{ascii} package
 ##' @param digits see \code{?ascii} in \code{ascii} package
@@ -182,10 +210,9 @@ survival.data.frame <- function(df, times = NULL, label = FALSE) {
 ##' @author David Hajage
 ##' @keywords univar
 ascii.survival <- function(x, format = "nice", digits = 5, include.rownames = FALSE, include.colnames = TRUE, header = TRUE, rstyle = "d", caption = NULL, caption.level = NULL, ...) {
-  do.call(ascii:::cbind.ascii, c(lapply(x, function(x) {
-    ascii:::ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}), caption = caption, caption.level = caption.level))
+  do.call(cbind.ascii, c(lapply(x, function(x) {
+    ascii(x, format = format, digits = digits, include.rownames = include.rownames, include.colnames = include.colnames, header = header, lgroup = attr(x, "lgroup"), n.lgroup = attr(x, "n.lgroup"), tgroup = attr(x, "tgroup"), n.tgroup = attr(x, "n.tgroup"), rgroup = attr(x, "rgroup"), n.rgroup = attr(x, "n.rgroup"), rstyle = rstyle, ...)}), caption = caption, caption.level = caption.level))
 }
-                    
 
 ##' Print survival object.
 ##'
@@ -193,7 +220,7 @@ ascii.survival <- function(x, format = "nice", digits = 5, include.rownames = FA
 ##'
 ##' @export
 ##' @method print survival
-##' @importFrom ascii print
+##' @import ascii
 ##' @param x a summarize object
 ##' @param type type of output (see \code{?ascii} in \code{ascii}
 ##' package)
