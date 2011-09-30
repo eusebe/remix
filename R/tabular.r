@@ -20,7 +20,7 @@ tabular <- function(x, y, margin = 0:2, useNA = c("no", "ifany", "always"), prop
   # remove unnecessary rows (all NA)
   results <- results[apply(results, 1, function(x) any(!is.na(x))), ]
 
-  attr(results, "lgroup") <- list(gsub("(^n|^cell|^row|^col)(\\.)", "\\1", gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\1", rownames(results))), rownames(n))
+  attr(results, "lgroup") <- list(gsub("(^n|^cell|^row|^col)(\\.)", "\\1", gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\1", rownames(results))), rn)
   attr(results, "n.lgroup") <- list(1, table(gsub("(^n\\.|^cell\\.|^row\\.|^col\\.)(.+$)", "\\2", rownames(results)))[rn])
   attr(results, "tgroup") <- NULL
   attr(results, "n.tgroup") <- NULL
