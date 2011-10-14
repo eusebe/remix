@@ -37,15 +37,15 @@ test.tabular.auto <- function(x, y, na = FALSE) {
   }
   tab <- table(x, y)
   exp <- rowSums(tab)%*%t(colSums(tab))/sum(tab)
-  if (all(exp >= 5))
+  if (any(dim(table(x, y)) == 1))
+    test <- list(p.value = NULL, method = NULL)
+  else if (all(exp >= 5))
     test <- suppressWarnings(chisq.test(x, y, correct = FALSE))
   else if (all(exp >= 3))
     test <- suppressWarnings(chisq.test(x, y, correct = TRUE))
-  else if (any(dim(table(x, y)) == 1))
-    test <- list(p.value = NULL, method = NULL)
   else
     test <- fisher.test(x, y)
-
+  
   p <- test$p.value
   method <- test$method
   list(p.value = p, method = method)
@@ -66,7 +66,11 @@ test.tabular.fisher <- function(x, y, na = FALSE) {
     x <- factor(addNA(x))
     y <- factor(addNA(y))
   }
-  test <- fisher.test(x, y)
+
+  if (any(dim(table(x, y)) == 1))
+    test <- list(p.value = NULL, method = NULL)
+  else 
+    test <- fisher.test(x, y)
 
   p <- test$p.value
   method <- test$method
