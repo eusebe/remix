@@ -176,7 +176,13 @@ survival.data.frame <- function(df, times = NULL, followup = FALSE, label = FALS
   n.lgroup <- list(n.lgroup1, n.lgroup2)
 
   lgroup1 <- unlist(lapply(lgroup, function(x) x[[1]]))
-  lgroup2 <- names(df)
+
+
+  if (!label)
+    lgroup2 <- names(df)
+  else
+    lgroup2 <- sapply(df, Hmisc:::label.default)
+
   lgroup <- list(lgroup1, lgroup2)
 
   results <- rbind.list(results)
