@@ -29,7 +29,7 @@ funs2fun <- function(...) {
         finalargs <- c(list(x = x), args)
       }
       tmp <- do.call(func, finalargs)
-      names(tmp) <- paste(fnames[i], names(tmp))
+      names(tmp) <- ascii:::trim(paste(fnames[i], names(tmp)))
       results <- c(results, tmp)
     }
     results
